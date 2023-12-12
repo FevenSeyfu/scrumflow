@@ -1,5 +1,5 @@
 import { Project } from "../models/projectModel.js";
-import { Notification } from "../models/notificationModel.js";
+import {sendScrumMasterProjectAssignmentNotification,sendTeamMemberProjectAssignmentNotification} from '../utils/notifications.js'
 import { User } from "../models/userModels.js";
 
 // create new project
@@ -31,20 +31,7 @@ export const createProject = async (req, res) => {
       if(scrumMasterUser.role !== 'Scrum Master' ){
         return res.status(403).json({ message: 'You can only assign Scrum Master.' });
       }
-      const notificationToScrumMaster = new Notification({
-        userId: scrumMaster,
-        message: `You have been assigned as Scrum Master for the project: ${name}`,
-        type: "projectAssignment",
-      });
-
-      await notificationToScrumMaster
-        .save()
-        .then((savedNotification) => {
-          console.log("Notification saved to Scrum Master:", savedNotification);
-        })
-        .catch((error) => {
-          console.error("Error saving notification to Scrum Master:", error);
-        });
+      sendScrumMasterProjectAssignmentNotification(scrumMaster,name);
     }
 
     // Trigger notification to team members
@@ -55,23 +42,7 @@ export const createProject = async (req, res) => {
           if(teamMemberUser.role !== 'Development Team' ){
             return res.status(403).json({ message: 'You can only assign Developer.' });
           }
-          const notificationToTeamMember = new Notification({
-            userId: teamMemberId,
-            message: `You have been assigned to the project: ${name}`,
-            type: "projectAssignment",
-          });
-  
-          await notificationToTeamMember
-            .save()
-            .then((savedNotification) => {
-              console.log(
-                "Notification saved to team member:",
-                savedNotification
-              );
-            })
-            .catch((error) => {
-              console.error("Error saving notification to team member:", error);
-            });
+          sendTeamMemberProjectAssignmentNotification(teamMemberId,name)
         }
       }
     }
@@ -171,43 +142,20 @@ export const assignProject = async (req, res) => {
     // Trigger notification to Scrum Master
     const scrumMasterUser = await User.findById(scrumMaster);
     if (scrumMasterUser) {
-      const notificationToScrumMaster = new Notification({
-        userId: scrumMaster,
-        message: `You have been assigned as Scrum Master for the project: ${existingProject.name}`,
-        type: "projectAssignment",
-      });
-
-      await notificationToScrumMaster
-        .save()
-        .then((savedNotification) => {
-          console.log("Notification saved to Scrum Master:", savedNotification);
-        })
-        .catch((error) => {
-          console.error("Error saving notification to Scrum Master:", error);
-        });
+      if(scrumMasterUser.role !== 'Scrum Master' ){
+        return res.status(403).json({ message: 'You can only assign Scrum Master.' });
+      }
+      sendScrumMasterProjectAssignmentNotification(scrumMaster,existingProject.name);
     }
 
     // Trigger notification to team members
     for (const teamMemberId of teamMembers) {
       const teamMemberUser = await User.findById(teamMemberId);
       if (teamMemberUser) {
-        const notificationToTeamMember = new Notification({
-          userId: teamMemberId,
-          message: `You have been assigned to the project: ${existingProject.name}`,
-          type: "projectAssignment",
-        });
-
-        await notificationToTeamMember
-          .save()
-          .then((savedNotification) => {
-            console.log(
-              "Notification saved to team member:",
-              savedNotification
-            );
-          })
-          .catch((error) => {
-            console.error("Error saving notification to team member:", error);
-          });
+        if(teamMemberUser.role !== 'Development Team' ){
+          return res.status(403).json({ message: 'You can only assign Developer.' });
+        }
+        sendTeamMemberProjectAssignmentNotification(teamMemberId,existingProject.name)
       }
     }
 
