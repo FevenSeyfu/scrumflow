@@ -146,7 +146,7 @@ export const assignTask = async (req, res) => {
         type: 'taskAssignment',
       });
       
-      notification.save()
+      await notification.save()
         .then(savedNotification => {
           console.log('Notification saved:', savedNotification);
         })

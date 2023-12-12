@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 // import models
 import { User } from "../models/userModels.js";
+import { Notification } from "../models/notificationModel.js";
 const saltRounds = 10;
 
 export const registerUser = async (req, res) => {
@@ -69,6 +70,8 @@ export const loginUser = async (req, res) => {
     if (!passwordMatch) {
       return res.status(401).json({ message: "Invalid email or password." });
     }
+    // fetch  user notification
+    const notifications = await Notification.find({ userId: user._id }).sort({ timestamp: -1 });
 
     // Generate a JWT token
     res.status(201).json({
@@ -80,6 +83,7 @@ export const loginUser = async (req, res) => {
       email: user.email,
       role: user.role,
       isAdmin:user.isAdmin,
+      notifications,
       token: generateToken(user._id),
       message: "Signed in Successfully!",
       success: true,
@@ -109,7 +113,11 @@ export const getUserById = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found." });
     }
-    res.status(200).json(user);
+
+    // fetch users notifications
+    const notifications = await Notification.find({ userId }).sort({ timestamp: -1 });
+    res.status(200).json(user,notification);
+
   } catch (error) {
     console.error("Error getting user by ID:", error);
     res.status(500).json({ message: "Internal Server Error" });
