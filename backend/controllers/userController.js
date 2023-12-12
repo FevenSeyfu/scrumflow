@@ -132,6 +132,11 @@ export const updateUser = async (req, res) => {
       isAdmin,
     } = req.body;
 
+    const updatingOwnProfile = req.user && req.user._id.toString() === req.params.id;
+    if (updatingOwnProfile && password) {
+      const hashedPassword = await bcrypt.hash(password, saltRounds);
+      updateFields.password = hashedPassword;
+    }
     // Update specific fields using Mongoose's update method
     const updateFields = {};
     if (username) updateFields.username = username;
@@ -141,12 +146,7 @@ export const updateUser = async (req, res) => {
     if (profileImage) updateFields.profileImage = profileImage;
     if (email) updateFields.email = email;
     if (role) updateFields.role = role;
-    // Allow users to update their own password
-    if (updatingOwnProfile && password) {
-      const hashedPassword = await bcrypt.hash(password, saltRounds);
-      updateFields.password = hashedPassword;
-    }
-
+    if (isAdmin) updateFields.isAdmin = isAdmin;
     // Use Mongoose's update method to update specific fields
     await User.updateOne({ _id: userId }, { $set: updateFields });
 
