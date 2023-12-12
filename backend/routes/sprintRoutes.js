@@ -1,8 +1,8 @@
 import express from 'express';
 import {getAllSprints,getSprintById,createSprint,updateSprint,deleteSprint} from '../controllers/sprintController.js';
+import {} from '../middlewares/validationMiddleware.js'
 import { protect } from '../middlewares/authMiddleware.js';
 const router = express.Router();
-
 
 router.get('/',protect, getAllSprints);
 router.get('/:id',protect, getSprintById);
