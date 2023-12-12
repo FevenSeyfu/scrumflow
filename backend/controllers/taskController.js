@@ -1,11 +1,13 @@
 import { Task } from "../models/taskModels.js";
-import {Notification} from '../models/notificationModel.js'
 import { User } from "../models/userModels.js";
-
+import {sendTaskAssignmentNotification} from '../utils/notifications.js'
 // get all tasks list
 export const getAllTasks = async (req, res) => {
   try {
-    const tasks = await Task.find();
+
+    const tasks = await Task.find().populate(
+      "assignee dependencies sprint"
+    );
     res.status(200).json(tasks);
   } catch (error) {
     console.error("Error getting tasks:", error);
@@ -16,7 +18,9 @@ export const getAllTasks = async (req, res) => {
 export const getTaskById = async (req, res) => {
   try {
     const taskId = req.params.id;
-    const task = await Task.findById(taskId);
+    const task = await Task.findById(taskId).populate(
+      "assignee dependencies sprint"
+    );
     if (!task) {
       return res.status(404).json({ message: "Task not found." });
     }
@@ -58,19 +62,7 @@ export const createTask = async (req, res) => {
       }else if(assignedUser.role !== 'Development Team' ){
         return res.status(403).json({ message: 'You can only assign Development Team.' });
       }else{
-        const notification = new Notification({
-          userId: assignee,
-          message: `You have been assigned a new task: ${name}`,
-          type: 'taskAssignment',
-        });
-        
-        await notification.save()
-          .then(savedNotification => {
-            console.log('Notification saved:', savedNotification);
-          })
-          .catch(error => {
-            console.error('Error saving notification:', error);
-          });
+        sendTaskAssignmentNotification(assignee,name)
       }
     }
     // Save the new task to the database
@@ -159,19 +151,7 @@ export const assignTask = async (req, res) => {
     // Trigger notification 
     const assignedUser = await User.findById(assignee);
     if(assignedUser){
-      const notification = new Notification({
-        userId: assignee,
-        message: `You have been assigned a new task: ${existingTask.name}`,
-        type: 'taskAssignment',
-      });
-      
-      await notification.save()
-        .then(savedNotification => {
-          console.log('Notification saved:', savedNotification);
-        })
-        .catch(error => {
-          console.error('Error saving notification:', error);
-        });
+      await sendTaskAssignmentNotification(assignee,existingTask.name);
     }
     // Save the updated task to DB
     await existingTask.save();

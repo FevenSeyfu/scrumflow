@@ -2,7 +2,8 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 // import models
 import { User } from "../models/userModels.js";
-import { Notification } from "../models/notificationModel.js";
+import {fetchUsersNotification} from '../utils/notifications.js'
+
 const saltRounds = 10;
 
 export const registerUser = async (req, res) => {
@@ -71,8 +72,7 @@ export const loginUser = async (req, res) => {
       return res.status(401).json({ message: "Invalid email or password." });
     }
     // fetch  user notification
-    const notifications = await Notification.find({ userId: user._id }).sort({ timestamp: -1 });
-
+    const notifications = await fetchUsersNotification({userId:user._id});
     // Generate a JWT token
     res.status(201).json({
       id: user._id,
@@ -115,7 +115,7 @@ export const getUserById = async (req, res) => {
     }
 
     // fetch users notifications
-    const notifications = await Notification.find({ userId }).sort({ timestamp: -1 });
+    const notifications = await fetchUsersNotification({userId});
     const responseData = { user, notifications };
     res.status(200).json(responseData);
 
