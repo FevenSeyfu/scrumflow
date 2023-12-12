@@ -83,6 +83,17 @@ export const validateTask = (req, res, next) => {
     return res.status(400).json({ message: "Task deadline is  required." });
   }
 
+  // Check if the requester is a Scrum Master, Development Team, or Admin
+  const isScrumMasterOrDevelopmentTeam = req.user && (
+    req.user.role === 'Scrum Master' ||
+    req.user.role === 'Development Team' ||
+    req.user.isAdmin
+  );
+  
+  if (!isScrumMasterOrDevelopmentTeam) {
+    return res.status(403).json({ message: 'Permission denied. Only Scrum Masters and Development Team can create tasks.' });
+  }
+
   next();
 };
 
