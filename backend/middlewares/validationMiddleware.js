@@ -1,3 +1,8 @@
+const isValidDate = (dateString) => {
+  const dateObject = new Date(dateString);
+  return !isNaN(dateObject.getTime()) && dateObject.toString() !== 'Invalid Date';
+};
+
 export const validateRegisterUser = (req, res, next) => {
   const { username, firstName, lastName, birthDate, email, password, role } =
     req.body;
@@ -28,6 +33,11 @@ export const validateRegisterUser = (req, res, next) => {
     return res
       .status(400)
       .json({ message: "Password must be at least 6 characters." });
+  }
+
+  // check if birth date is valid date type
+  if (!isValidDate(birthDate)) {
+    return res.status(400).json({ message: "Invalid birth date format." });
   }
   next();
 };
@@ -82,14 +92,18 @@ export const validateTask = (req, res, next) => {
   }else if (!deadline) {
     return res.status(400).json({ message: "Task deadline is  required." });
   }
-
+  
+  // check if deadline is valid date type
+  if (!isValidDate(deadline)) {
+    return res.status(400).json({ message: "Invalid deadline date format." });
+  }
   // Check if the requester is a Scrum Master, Development Team, or Admin
   const isScrumMasterOrDevelopmentTeam = req.user && (
     req.user.role === 'Scrum Master' ||
     req.user.role === 'Development Team' ||
     req.user.isAdmin
   );
-  
+
   if (!isScrumMasterOrDevelopmentTeam) {
     return res.status(403).json({ message: 'Permission denied. Only Scrum Masters and Development Team can create tasks.' });
   }
@@ -107,6 +121,11 @@ export const validateProject = (req, res, next) => {
     return res.status(400).json({ message: "Project description is  required." });
   }else if (!startDate) {
     return res.status(400).json({ message: "Project startDate is  required." });
+  }
+
+  // check if Start is valid date type
+  if (!isValidDate(startDate)) {
+    return res.status(400).json({ message: "Invalid start date format." });
   }
 
   // Check if the requester is a Product Owner
@@ -129,5 +148,15 @@ export const validateSprint = (req, res, next) => {
     return res.status(400).json({ message: "Sprint duration is  required." });
   }
 
+  // check if deadline is valid date type
+  if (!isValidDate(startDate)) {
+    return res.status(400).json({ message: "Invalid startdate date format." });
+  }
+
+  // Check if the requester is a Scrum Master
+  const isScrumMaster = req.user && (req.user.role === 'Scrum Master');
+  if (!isScrumMaster) {
+    return res.status(403).json({ message: 'Permission denied. Only Scrum Masters can create sprints.' });
+  }
   next();
 };

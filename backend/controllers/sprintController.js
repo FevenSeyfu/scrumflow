@@ -47,8 +47,7 @@ export const createSprint = async (req, res) => {
       sprint,
     });
   } catch (error) {
-    console.error("Error creating sprint:", error);
-    res.status(500).json({ message: "Internal Server Error" });
+    res.status(500).json({ message: error.message });
   }
 };
 // update sprint
@@ -76,8 +75,7 @@ export const updateSprint = async (req, res) => {
 
     res.status(200).json({ message: "Sprint updated successfully." });
   } catch (error) {
-    console.error("Error updating sprint:", error);
-    res.status(500).json({ message: "Internal Server Error" });
+    res.status(500).json({ message: error.message });
   }
 };
 // delete sprint bt id
@@ -91,7 +89,6 @@ export const deleteSprint = async (req, res) => {
     }
     res.status(200).json({ message: "Sprint deleted successfully." });
   } catch (error) {
-    console.error("Error deleting sprint:", error);
-    res.status(500).json({ message: "Internal Server Error" });
+    res.status(500).json({ message: error.message });
   }
 };
