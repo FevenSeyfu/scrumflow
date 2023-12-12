@@ -1,4 +1,6 @@
 import { Project } from "../models/projectModel.js";
+import { Notification } from "../models/notificationModel.js";
+import { User } from "../models/userModels.js";
 
 // create new project
 export const createProject = async (req, res) => {
@@ -24,6 +26,48 @@ export const createProject = async (req, res) => {
     });
 
     await newProject.save();
+    // Trigger notification to Scrum Master
+    const scrumMasterUser = await User.findById(scrumMaster);
+    if (scrumMasterUser) {
+      const notificationToScrumMaster = new Notification({
+        userId: scrumMaster,
+        message: `You have been assigned as Scrum Master for the project: ${name}`,
+        type: "projectAssignment",
+      });
+
+      await notificationToScrumMaster
+        .save()
+        .then((savedNotification) => {
+          console.log("Notification saved to Scrum Master:", savedNotification);
+        })
+        .catch((error) => {
+          console.error("Error saving notification to Scrum Master:", error);
+        });
+    }
+
+    // Trigger notification to team members
+    for (const teamMemberId of teamMembers) {
+      const teamMemberUser = await User.findById(teamMemberId);
+      if (teamMemberUser) {
+        const notificationToTeamMember = new Notification({
+          userId: teamMemberId,
+          message: `You have been assigned to the project: ${name}`,
+          type: "projectAssignment",
+        });
+
+        await notificationToTeamMember
+          .save()
+          .then((savedNotification) => {
+            console.log(
+              "Notification saved to team member:",
+              savedNotification
+            );
+          })
+          .catch((error) => {
+            console.error("Error saving notification to team member:", error);
+          });
+      }
+    }
 
     res.status(201).json({ message: "Project created successfully." });
   } catch (error) {
@@ -102,12 +146,13 @@ export const deleteProject = async (req, res) => {
     const projectId = req.params.id;
 
     const existingProject = await Project.findByIdAndDelete(projectId);
-        if(!existingProject){
-            return response.status(404).json({message: 'Post not found'})
-        }
+    if (!existingProject) {
+      return response.status(404).json({ message: "Post not found" });
+    }
     res.status(200).json({ message: "Project deleted successfully." });
   } catch (error) {
     console.error("Error deleting project:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
