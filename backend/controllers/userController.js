@@ -116,7 +116,8 @@ export const getUserById = async (req, res) => {
 
     // fetch users notifications
     const notifications = await Notification.find({ userId }).sort({ timestamp: -1 });
-    res.status(200).json(user,notification);
+    const responseData = { user, notifications };
+    res.status(200).json(responseData);
 
   } catch (error) {
     console.error("Error getting user by ID:", error);
