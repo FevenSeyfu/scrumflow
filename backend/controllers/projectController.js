@@ -17,7 +17,7 @@ export const createProject = async (req, res) => {
       name,
       description,
       startDate,
-      projectOwner,
+      projectOwner: req.user._id,
       scrumMaster,
       teamMembers,
       tasks,
