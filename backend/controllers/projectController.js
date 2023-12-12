@@ -25,10 +25,12 @@ export const createProject = async (req, res) => {
       tasks,
     });
 
-    await newProject.save();
     // Trigger notification to Scrum Master
     const scrumMasterUser = await User.findById(scrumMaster);
     if (scrumMasterUser) {
+      if(scrumMasterUser.role !== 'Scrum Master' ){
+        return res.status(403).json({ message: 'You can only assign Scrum Master.' });
+      }
       const notificationToScrumMaster = new Notification({
         userId: scrumMaster,
         message: `You have been assigned as Scrum Master for the project: ${name}`,
@@ -46,29 +48,34 @@ export const createProject = async (req, res) => {
     }
 
     // Trigger notification to team members
-    for (const teamMemberId of teamMembers) {
-      const teamMemberUser = await User.findById(teamMemberId);
-      if (teamMemberUser) {
-        const notificationToTeamMember = new Notification({
-          userId: teamMemberId,
-          message: `You have been assigned to the project: ${name}`,
-          type: "projectAssignment",
-        });
-
-        await notificationToTeamMember
-          .save()
-          .then((savedNotification) => {
-            console.log(
-              "Notification saved to team member:",
-              savedNotification
-            );
-          })
-          .catch((error) => {
-            console.error("Error saving notification to team member:", error);
+    if(teamMembers){
+      for (const teamMemberId of teamMembers) {
+        const teamMemberUser = await User.findById(teamMemberId);
+        if (teamMemberUser) {
+          if(teamMemberUser.role !== 'Development Team' ){
+            return res.status(403).json({ message: 'You can only assign Developer.' });
+          }
+          const notificationToTeamMember = new Notification({
+            userId: teamMemberId,
+            message: `You have been assigned to the project: ${name}`,
+            type: "projectAssignment",
           });
+  
+          await notificationToTeamMember
+            .save()
+            .then((savedNotification) => {
+              console.log(
+                "Notification saved to team member:",
+                savedNotification
+              );
+            })
+            .catch((error) => {
+              console.error("Error saving notification to team member:", error);
+            });
+        }
       }
     }
-
+    await newProject.save();
     res.status(201).json({ message: "Project created successfully." });
   } catch (error) {
     console.error("Error creating project:", error);
