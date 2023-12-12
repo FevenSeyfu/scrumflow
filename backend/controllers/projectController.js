@@ -141,6 +141,75 @@ export const updateProject = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+export const assignProject = async (req, res) => {
+  try {
+    const projectId = req.params.id;
+    const { scrumMaster, teamMembers } = req.body;
+
+    // Fetch the project by ID
+    const existingProject = await Project.findById(projectId);
+
+    if (!existingProject) {
+      return res.status(404).json({ message: "Project not found." });
+    }
+
+    // Update project fields
+    existingProject.scrumMaster = scrumMaster;
+    existingProject.teamMembers = teamMembers;
+
+    // Save the updated project
+    await existingProject.save();
+
+    // Trigger notification to Scrum Master
+    const scrumMasterUser = await User.findById(scrumMaster);
+    if (scrumMasterUser) {
+      const notificationToScrumMaster = new Notification({
+        userId: scrumMaster,
+        message: `You have been assigned as Scrum Master for the project: ${existingProject.name}`,
+        type: "projectAssignment",
+      });
+
+      await notificationToScrumMaster
+        .save()
+        .then((savedNotification) => {
+          console.log("Notification saved to Scrum Master:", savedNotification);
+        })
+        .catch((error) => {
+          console.error("Error saving notification to Scrum Master:", error);
+        });
+    }
+
+    // Trigger notification to team members
+    for (const teamMemberId of teamMembers) {
+      const teamMemberUser = await User.findById(teamMemberId);
+      if (teamMemberUser) {
+        const notificationToTeamMember = new Notification({
+          userId: teamMemberId,
+          message: `You have been assigned to the project: ${existingProject.name}`,
+          type: "projectAssignment",
+        });
+
+        await notificationToTeamMember
+          .save()
+          .then((savedNotification) => {
+            console.log(
+              "Notification saved to team member:",
+              savedNotification
+            );
+          })
+          .catch((error) => {
+            console.error("Error saving notification to team member:", error);
+          });
+      }
+    }
+
+    res.status(200).json({ message: "Project assigned successfully." });
+  } catch (error) {
+    console.error("Error assigning project:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 export const deleteProject = async (req, res) => {
   try {
     const projectId = req.params.id;
