@@ -49,7 +49,7 @@ app.use((request, response) => {
 // lets connect to db
 mongoose.connect(process.env.DATABASE_URL).then(()=>{
     console.log('App connected to database');
-    app.listen(5555 || process.env.PORT ,()=>{
+    app.listen(process.env.PORT||5555  ,()=>{
         console.log(`App is listening to Port : ${process.env.PORT}`)
     })
 }).catch((error)=> {
