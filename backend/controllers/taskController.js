@@ -52,6 +52,23 @@ export const createTask = async (req, res) => {
 
     // Save the new task to the database
     const task = await newTask.save();
+    // Trigger notification 
+    const assignedUser = await User.findById(assignee);
+    if(assignedUser){
+      const notification = new Notification({
+        userId: assignee,
+        message: `You have been assigned a new task: ${name}`,
+        type: 'taskAssignment',
+      });
+      
+      await notification.save()
+        .then(savedNotification => {
+          console.log('Notification saved:', savedNotification);
+        })
+        .catch(error => {
+          console.error('Error saving notification:', error);
+        });
+    }
 
     res.status(201).json({
       message: "Task created successfully!",
