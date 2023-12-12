@@ -1,4 +1,6 @@
 import { Task } from "../models/taskModels.js";
+import {Notification} from '../models/notificationModel.js'
+import { User } from "../models/userModels.js";
 
 // get all tasks list
 export const getAllTasks = async (req, res) => {
@@ -118,3 +120,44 @@ export const deleteTask = async (req, res) => {
   }
 };
 
+export const assignTask = async (req, res) => {
+  try {
+    const taskId = req.params.id;
+    const { assignee } = req.body;
+    // Find the task by ID
+    const existingTask = await Task.findById(taskId);
+
+    if (!existingTask) {
+      return res.status(404).json({ message: 'Task not found.' });
+    }
+    
+    // Update assignee field
+    existingTask.assignee = assignee;
+
+    // Save the updated task
+    await existingTask.save();
+
+    // Trigger notification 
+    const assignedUser = await User.findById(assignee);
+    if(assignedUser){
+      const notification = new Notification({
+        userId: assignee,
+        message: `You have been assigned a new task: ${existingTask.name}`,
+        type: 'taskAssignment',
+      });
+      
+      notification.save()
+        .then(savedNotification => {
+          console.log('Notification saved:', savedNotification);
+        })
+        .catch(error => {
+          console.error('Error saving notification:', error);
+        });
+    }
+
+    res.status(200).json({ message: 'Task assigned successfully.' });
+  } catch (error) {
+    console.error('Error assigning task:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
