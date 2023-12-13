@@ -1,3 +1,5 @@
+import { User } from "../models/userModels.js";
+
 const isValidDate = (dateString) => {
   const dateObject = new Date(dateString);
   return !isNaN(dateObject.getTime()) && dateObject.toString() !== 'Invalid Date';
@@ -103,7 +105,7 @@ export const validateTask = (req, res, next) => {
     req.user.role === 'Development Team' ||
     req.user.isAdmin
   );
-
+  
   if (!isScrumMasterOrDevelopmentTeam) {
     return res.status(403).json({ message: 'Permission denied. Only Scrum Masters and Development Team can create tasks.' });
   }
@@ -112,7 +114,7 @@ export const validateTask = (req, res, next) => {
 };
 
 export const validateProject = (req, res, next) => {
-  const { name,description,startDate } = req.body;
+  const { name,description,startDate,scrumMaster } = req.body;
 
   // check all required fields
   if (!name) {
@@ -121,6 +123,8 @@ export const validateProject = (req, res, next) => {
     return res.status(400).json({ message: "Project description is  required." });
   }else if (!startDate) {
     return res.status(400).json({ message: "Project startDate is  required." });
+  }else if (!scrumMaster) {
+    return res.status(400).json({ message: "Scrum Master need to be assigned to project." });
   }
 
   // check if Start is valid date type
@@ -159,4 +163,18 @@ export const validateSprint = (req, res, next) => {
     return res.status(403).json({ message: 'Permission denied. Only Scrum Masters can create sprints.' });
   }
   next();
+};
+
+export const validateUserForNotification = async (userId, role) => {
+  const user = await User.findById(userId);
+
+  if (!user) {
+    return { isValid: false, message: `${role} not found.` };
+  }
+
+  if (user.role !== role) {
+    return { isValid: false, message: `You can only assign ${role}.` };
+  }
+
+  return { isValid: true, user };
 };
