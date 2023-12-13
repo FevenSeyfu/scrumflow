@@ -1,10 +1,12 @@
 import { Notification } from "../models/notificationModel.js";
 
+// send notification to user called in loginUser ang getUserById
 export const fetchUsersNotification = (userId) => {
   const notifications = Notification.find(userId).sort({ timestamp: -1 });
   return notifications;
 };
 
+// taskAssignement Notification triggred on taskCreate and taskAssignment
 export const sendTaskAssignmentNotification = async (assignee, taskName) => {
   const notification = new Notification({
     userId: assignee,
@@ -22,6 +24,7 @@ export const sendTaskAssignmentNotification = async (assignee, taskName) => {
     });
 };
 
+// project Assignment for scrum Master
 export const sendScrumMasterProjectAssignmentNotification = async (
   assignee,
   taskName
@@ -42,6 +45,7 @@ export const sendScrumMasterProjectAssignmentNotification = async (
     });
 };
 
+// project assignment notification for development team
 export const sendTeamMemberProjectAssignmentNotification = async (
   assignee,
   taskName
@@ -60,4 +64,20 @@ export const sendTeamMemberProjectAssignmentNotification = async (
     .catch((error) => {
       console.error("Error saving notification to team member:", error);
     });
+};
+
+// notification for task deadline
+export const sendDeadlineNotification = async (userId, taskName, daysLeft) => {
+  const notification = new Notification({
+    userId,
+    message: `The deadline for the task "${taskName}" is approaching. You have ${daysLeft} days left.`,
+    type: "deadline",
+  });
+
+  try {
+    const savedNotification = await notification.save();
+    console.log("Deadline Notification saved:", savedNotification);
+  } catch (error) {
+    console.error("Error saving Deadline Notification:", error);
+  }
 };

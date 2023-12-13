@@ -1,6 +1,7 @@
 import { Task } from "../models/taskModels.js";
 import { User } from "../models/userModels.js";
-import {sendTaskAssignmentNotification} from '../utils/notifications.js'
+import {sendTaskAssignmentNotification,sendDeadlineNotification} from '../utils/notifications.js'
+
 // get all tasks list
 export const getAllTasks = async (req, res) => {
   try {
@@ -67,6 +68,13 @@ export const createTask = async (req, res) => {
     }
     // Save the new task to the database
     const task = await newTask.save();
+
+    // Calculate days left for the deadline and Trigger deadline notification if less than 3 days left
+    const daysLeft = Math.ceil((new Date(deadline) - new Date()) / (1000 * 60 * 60 * 24));
+    if (daysLeft <= 3) {
+      await sendDeadlineNotification(assignee, name, daysLeft);
+    }
+
     res.status(201).json({
       message: "Task created successfully!",
       success: true,
