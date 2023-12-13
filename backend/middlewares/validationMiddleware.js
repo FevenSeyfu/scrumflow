@@ -1,3 +1,5 @@
+import { User } from "../models/userModels.js";
+
 const isValidDate = (dateString) => {
   const dateObject = new Date(dateString);
   return !isNaN(dateObject.getTime()) && dateObject.toString() !== 'Invalid Date';
@@ -161,4 +163,18 @@ export const validateSprint = (req, res, next) => {
     return res.status(403).json({ message: 'Permission denied. Only Scrum Masters can create sprints.' });
   }
   next();
+};
+
+export const validateUserForNotification = async (userId, role) => {
+  const user = await User.findById(userId);
+
+  if (!user) {
+    return { isValid: false, message: `${role} not found.` };
+  }
+
+  if (user.role !== role) {
+    return { isValid: false, message: `You can only assign ${role}.` };
+  }
+
+  return { isValid: true, user };
 };

@@ -1,6 +1,42 @@
 import { Project } from "../models/projectModel.js";
 import {sendScrumMasterProjectAssignmentNotification,sendTeamMemberProjectAssignmentNotification} from '../utils/notifications.js'
+import {validateUserForNotification} from '../middlewares/validationMiddleware.js'
 import { User } from "../models/userModels.js";
+
+// assign projects 
+export const assignProject = async (projectId, scrumMaster, teamMembers) => {
+  // Fetch the project by ID
+  const existingProject = await Project.findById(projectId);
+
+  if (!existingProject) {
+    return { success: false, message: "Project not found." };
+  }
+
+  // Update project fields
+  existingProject.scrumMaster = scrumMaster;
+  existingProject.teamMembers = teamMembers;
+
+  // Save the updated project
+  await existingProject.save();
+
+  // Trigger notification to Scrum Master
+  const scrumMasterUserValidation = await validateUserForNotification(scrumMaster, 'Scrum Master');
+  if (!scrumMasterUserValidation.isValid) {
+    return { success: false, message: scrumMasterUserValidation.message };
+  }
+  sendScrumMasterProjectAssignmentNotification(scrumMaster, existingProject.name);
+
+  // Trigger notification to team members
+  for (const teamMemberId of teamMembers) {
+    const teamMemberUserValidation = await validateUserForNotification(teamMemberId, 'Development Team');
+    if (!teamMemberUserValidation.isValid) {
+      return { success: false, message: teamMemberUserValidation.message };
+    }
+    sendTeamMemberProjectAssignmentNotification(teamMemberId, existingProject.name);
+  }
+
+  return { success: true, message: "Project assigned successfully." };
+};
 
 // create new project
 export const createProject = async (req, res) => {
@@ -25,27 +61,13 @@ export const createProject = async (req, res) => {
       tasks,
     });
 
-    // Trigger notification to Scrum Master
-    const scrumMasterUser = await User.findById(scrumMaster);
-    if (scrumMasterUser) {
-      if(scrumMasterUser.role !== 'Scrum Master' ){
-        return res.status(403).json({ message: 'You can only assign Scrum Master.' });
-      }
-      sendScrumMasterProjectAssignmentNotification(scrumMaster,name);
+    // Handle assinging projects
+    const assignmentResult = await assignProject(newProject._id, scrumMaster, teamMembers);
+
+    if (!assignmentResult.success) {
+      return res.status(403).json({ message: assignmentResult.message });
     }
 
-    // Trigger notification to team members
-    if(teamMembers){
-      for (const teamMemberId of teamMembers) {
-        const teamMemberUser = await User.findById(teamMemberId);
-        if (teamMemberUser) {
-          if(teamMemberUser.role !== 'Development Team' ){
-            return res.status(403).json({ message: 'You can only assign Developer.' });
-          }
-          sendTeamMemberProjectAssignmentNotification(teamMemberId,name)
-        }
-      }
-    }
     await newProject.save();
     res.status(201).json({ message: "Project created successfully." });
   } catch (error) {
@@ -111,30 +133,14 @@ export const updateProject = async (req, res) => {
     existingProject.teamMembers = teamMembers;
     existingProject.tasks = tasks;
 
+    // Handle assinging projects
+    const assignmentResult = await assignProject(projectId, scrumMaster, teamMembers);
+
+    if (!assignmentResult.success) {
+      return res.status(403).json({ message: assignmentResult.message });
+    }
     // save the updated project to database
     await existingProject.save();
-
-    // Trigger notification to Scrum Master
-    const scrumMasterUser = await User.findById(scrumMaster);
-    if (!scrumMasterUser) {
-      return res.status(404).json({ message: 'Scrum Master not found.' });
-    }
-    if (scrumMasterUser.role !== 'Scrum Master') {
-      return res.status(403).json({ message: 'You can only assign Scrum Master.' });
-    }
-    sendScrumMasterProjectAssignmentNotification(scrumMaster, existingProject.name);
-
-    // Trigger notification to team members
-    for (const teamMemberId of teamMembers) {
-      const teamMemberUser = await User.findById(teamMemberId);
-      if (!teamMemberUser) {
-        return res.status(404).json({ message: 'Team Member not found.' });
-      }
-      if (teamMemberUser.role !== 'Development Team') {
-        return res.status(403).json({ message: 'You can only assign Developer.' });
-      }
-      sendTeamMemberProjectAssignmentNotification(teamMemberId, existingProject.name);
-    }
 
     // Check project completion after update
     const completionStatus = await checkProjectCompletion(projectId);
@@ -148,56 +154,6 @@ export const updateProject = async (req, res) => {
   }
 };
 
-export const assignProject = async (req, res) => {
-  try {
-    const projectId = req.params.id;
-    const { scrumMaster, teamMembers } = req.body;
-
-    // Fetch the project by ID
-    const existingProject = await Project.findById(projectId);
-
-    if (!existingProject) {
-      return res.status(404).json({ message: "Project not found." });
-    }
-
-    // Update project fields
-    existingProject.scrumMaster = scrumMaster;
-    existingProject.teamMembers = teamMembers;
-
-    // Save the updated project
-    await existingProject.save();
-
-    // Trigger notification to Scrum Master
-    const scrumMasterUser = await User.findById(scrumMaster);
-    if (!scrumMasterUser) {
-      return res.status(404).json({ message: 'Scrum Master not found.' });
-    }
-    if(scrumMasterUser.role !== 'Scrum Master' ){
-      return res.status(403).json({ message: 'You can only assign Scrum Master.' });
-    }
-    sendScrumMasterProjectAssignmentNotification(scrumMaster,existingProject.name);
-  
-
-    // Trigger notification to team members
-    for (const teamMemberId of teamMembers) {
-      const teamMemberUser = await User.findById(teamMemberId);
-      if (!teamMemberUser) {
-        return res.status(404).json({ message: 'Team Member not found.' });
-      }
-      if(teamMemberUser.role !== 'Development Team' ){
-        return res.status(403).json({ message: 'You can only assign Developer.' });
-      }
-      sendTeamMemberProjectAssignmentNotification(teamMemberId,existingProject.name)
-    
-    }
-
-
-    res.status(200).json({ message: "Project assigned successfully." });
-  } catch (error) {
-    console.error("Error assigning project:", error);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-};
 export const deleteProject = async (req, res) => {
   try {
     const projectId = req.params.id;
