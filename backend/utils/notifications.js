@@ -68,16 +68,17 @@ export const sendTeamMemberProjectAssignmentNotification = async (
 
 // notification for task deadline
 export const sendDeadlineNotification = async (userId, taskName, daysLeft) => {
-  const notification = new Notification({
+  const deadlineNotification = new Notification({
     userId,
     message: `The deadline for the task "${taskName}" is approaching. You have ${daysLeft} days left.`,
     type: "deadline",
   });
 
-  try {
-    const savedNotification = await notification.save();
-    console.log("Deadline Notification saved:", savedNotification);
-  } catch (error) {
+  await deadlineNotification
+    .save()
+    .then((savedNotification)=>{
+      console.log("Deadline Notification saved:", savedNotification);
+    }).catch((error)=> {
     console.error("Error saving Deadline Notification:", error);
-  }
+    });
 };
