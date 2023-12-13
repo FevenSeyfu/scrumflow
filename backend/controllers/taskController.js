@@ -4,8 +4,8 @@ import {
   sendTaskAssignmentNotification,
   sendDeadlineNotification,
 } from "../utils/notifications.js";
+import { validateUserForNotification } from "../middlewares/validationMiddleware.js";
 
-// get all tasks list
 export const getAllTasks = async (req, res) => {
   try {
     const tasks = await Task.find().populate("assignee dependencies sprint");
@@ -15,23 +15,25 @@ export const getAllTasks = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
-// get tasks by id
+
 export const getTaskById = async (req, res) => {
   try {
     const taskId = req.params.id;
     const task = await Task.findById(taskId).populate(
       "assignee dependencies sprint"
     );
+
     if (!task) {
       return res.status(404).json({ message: "Task not found." });
     }
+
     res.status(200).json(task);
   } catch (error) {
     console.error("Error getting task by ID:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
-// create New task
+
 export const createTask = async (req, res) => {
   try {
     const {
@@ -44,7 +46,6 @@ export const createTask = async (req, res) => {
       sprint,
     } = req.body;
 
-    // Create a new task
     const newTask = new Task({
       name,
       description,
@@ -57,21 +58,19 @@ export const createTask = async (req, res) => {
 
     // Trigger notification
     if (assignee) {
-      const assignedUser = await User.findById(assignee);
-      if (!assignedUser) {
-        return res.status(404).json({ message: "Assignee not found." });
-      } else if (assignedUser.role !== "Development Team") {
-        return res
-          .status(403)
-          .json({ message: "You can only assign Development Team." });
-      } else {
-        sendTaskAssignmentNotification(assignee, name);
+      const validation = await validateUserForNotification(
+        assignee,
+        "Development Team"
+      );
+      if (!validation.isValid) {
+        return res.status(403).json({ message: validation.message });
       }
+      sendTaskAssignmentNotification(assignee, name);
     }
-    // Save the new task to the database
+
     const task = await newTask.save();
 
-    // Calculate days left for the deadline and Trigger deadline notification if less than 3 days left
+    // Calculate days left for the deadline and trigger deadline notification if less than 3 days left
     const daysLeft = Math.ceil(
       (new Date(deadline) - new Date()) / (1000 * 60 * 60 * 24)
     );
@@ -90,7 +89,6 @@ export const createTask = async (req, res) => {
   }
 };
 
-// update task
 export const updateTask = async (req, res) => {
   try {
     const taskId = req.params.id;
@@ -104,30 +102,26 @@ export const updateTask = async (req, res) => {
       sprint,
     } = req.body;
 
-    // Find the task by ID
     const existingTask = await Task.findById(taskId).populate("dependencies");
 
     if (!existingTask) {
       return res.status(404).json({ message: "Task not found." });
     }
 
-    // validate assignee
-    const assignedUser = await User.findById(assignee);
-
-    if (!assignedUser) {
-      return res.status(404).json({ message: "Assignee not found." });
-    }
-
-    if (assignedUser.role !== "Development Team") {
-      return res
-        .status(403)
-        .json({ message: "You can only assign to Development Team." });
+    // Validate assignee
+    const validation = await validateUserForNotification(
+      assignee,
+      "Development Team"
+    );
+    if (!validation.isValid) {
+      return res.status(403).json({ message: validation.message });
     }
 
     // Trigger notification
-    if (assignedUser) {
+    if (validation.user) {
       await sendTaskAssignmentNotification(assignee, existingTask.name);
     }
+
     // Update task fields
     existingTask.name = name;
     existingTask.description = description;
@@ -139,11 +133,12 @@ export const updateTask = async (req, res) => {
 
     // Save the updated task
     await existingTask.save();
-    // check task completion after update
-    const completionStatus  = await checkTaskCompletion(taskId);
-    res.status(200).json({ 
-      message: "Task updated successfully." ,
-      completionStatus
+
+    // Check task completion after update
+    const completionStatus = await checkTaskCompletion(taskId);
+    res.status(200).json({
+      message: "Task updated successfully.",
+      completionStatus,
     });
   } catch (error) {
     console.error("Error updating task:", error);
@@ -151,7 +146,6 @@ export const updateTask = async (req, res) => {
   }
 };
 
-// delete task
 export const deleteTask = async (req, res) => {
   try {
     const taskId = req.params.id;
@@ -160,6 +154,7 @@ export const deleteTask = async (req, res) => {
     if (!existingTask) {
       return res.status(404).json({ message: "Task not found" });
     }
+
     res.status(200).json({ message: "Task deleted successfully." });
   } catch (error) {
     console.error("Error deleting task:", error);
@@ -171,34 +166,33 @@ export const assignTask = async (req, res) => {
   try {
     const taskId = req.params.id;
     const { assignee } = req.body;
-    // Find the task by ID
+
     const existingTask = await Task.findById(taskId);
 
     if (!existingTask) {
       return res.status(404).json({ message: "Task not found." });
     }
 
-    // validate assignee
-    const assignedUser = await User.findById(assignee);
-
-    if (!assignedUser) {
-      return res.status(404).json({ message: "Assignee not found." });
+    // Validate assignee
+    const validation = await validateUserForNotification(
+      assignee,
+      "Development Team"
+    );
+    if (!validation.isValid) {
+      return res.status(403).json({ message: validation.message });
     }
 
-    if (assignedUser.role !== "Development Team") {
-      return res
-        .status(403)
-        .json({ message: "You can only assign to Development Team." });
-    }
     // Update assignee field
     existingTask.assignee = assignee;
 
     // Trigger notification
-    if (assignedUser) {
+    if (validation.user) {
       await sendTaskAssignmentNotification(assignee, existingTask.name);
     }
+
     // Save the updated task to DB
     await existingTask.save();
+
     res.status(200).json({ message: "Task assigned successfully." });
   } catch (error) {
     console.error("Error assigning task:", error);
@@ -206,17 +200,19 @@ export const assignTask = async (req, res) => {
   }
 };
 
-// check task completion 
 export const checkTaskCompletion = async (taskId) => {
   const task = await Task.findById(taskId).populate("dependencies");
-  
+
   if (!task) {
-    return { completed: false, message: 'Task not found.' };
+    return { completed: false, message: "Task not found." };
   }
 
-  if (task.dependencies.some(dep => dep.status !== 'Done')) {
-    return { completed: false, message: 'Dependencies are not completed.' };
+  if (task.dependencies.some((dep) => dep.status !== "Done")) {
+    return { completed: false, message: "Dependencies are not completed." };
   }
 
-  return { completed: task.status === 'Done', message: 'Task completion status checked.' };
+  return {
+    completed: task.status === "Done",
+    message: "Task completion status checked.",
+  };
 };
