@@ -141,23 +141,28 @@ export const assignProject = async (req, res) => {
 
     // Trigger notification to Scrum Master
     const scrumMasterUser = await User.findById(scrumMaster);
-    if (scrumMasterUser) {
-      if(scrumMasterUser.role !== 'Scrum Master' ){
-        return res.status(403).json({ message: 'You can only assign Scrum Master.' });
-      }
-      sendScrumMasterProjectAssignmentNotification(scrumMaster,existingProject.name);
+    if (!scrumMasterUser) {
+      return res.status(404).json({ message: 'Scrum Master not found.' });
     }
+    if(scrumMasterUser.role !== 'Scrum Master' ){
+      return res.status(403).json({ message: 'You can only assign Scrum Master.' });
+    }
+    sendScrumMasterProjectAssignmentNotification(scrumMaster,existingProject.name);
+  
 
     // Trigger notification to team members
     for (const teamMemberId of teamMembers) {
       const teamMemberUser = await User.findById(teamMemberId);
-      if (teamMemberUser) {
-        if(teamMemberUser.role !== 'Development Team' ){
-          return res.status(403).json({ message: 'You can only assign Developer.' });
-        }
-        sendTeamMemberProjectAssignmentNotification(teamMemberId,existingProject.name)
+      if (!teamMemberUser) {
+        return res.status(404).json({ message: 'Team Member not found.' });
       }
+      if(teamMemberUser.role !== 'Development Team' ){
+        return res.status(403).json({ message: 'You can only assign Developer.' });
+      }
+      sendTeamMemberProjectAssignmentNotification(teamMemberId,existingProject.name)
+    
     }
+
 
     res.status(200).json({ message: "Project assigned successfully." });
   } catch (error) {
@@ -180,3 +185,17 @@ export const deleteProject = async (req, res) => {
   }
 };
 
+export const checkProjectCompletion = async (projectId) => {
+  const project = await Project.findById(projectId).populate("tasks");
+
+  if (!project) {
+    return { completed: false, message: 'Project not found.' };
+  }
+
+  const incompleteTasks = project.tasks.filter(task => task.status !== 'Done');
+
+  return {
+    completed: incompleteTasks.length === 0,
+    message: 'Project completion status checked.'
+  };
+};
