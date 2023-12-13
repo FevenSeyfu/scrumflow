@@ -111,9 +111,37 @@ export const updateProject = async (req, res) => {
     existingProject.teamMembers = teamMembers;
     existingProject.tasks = tasks;
 
+    // save the updated project to database
     await existingProject.save();
 
-    res.status(200).json({ message: "Project updated successfully." });
+    // Trigger notification to Scrum Master
+    const scrumMasterUser = await User.findById(scrumMaster);
+    if (!scrumMasterUser) {
+      return res.status(404).json({ message: 'Scrum Master not found.' });
+    }
+    if (scrumMasterUser.role !== 'Scrum Master') {
+      return res.status(403).json({ message: 'You can only assign Scrum Master.' });
+    }
+    sendScrumMasterProjectAssignmentNotification(scrumMaster, existingProject.name);
+
+    // Trigger notification to team members
+    for (const teamMemberId of teamMembers) {
+      const teamMemberUser = await User.findById(teamMemberId);
+      if (!teamMemberUser) {
+        return res.status(404).json({ message: 'Team Member not found.' });
+      }
+      if (teamMemberUser.role !== 'Development Team') {
+        return res.status(403).json({ message: 'You can only assign Developer.' });
+      }
+      sendTeamMemberProjectAssignmentNotification(teamMemberId, existingProject.name);
+    }
+
+    // Check project completion after update
+    const completionStatus = await checkProjectCompletion(projectId);
+    res.status(200).json({
+      message: "Project updated successfully.",
+      completionStatus,
+    });
   } catch (error) {
     console.error("Error updating project:", error);
     res.status(500).json({ message: "Internal Server Error" });
