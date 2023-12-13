@@ -6,6 +6,44 @@ import {
 } from "../utils/notifications.js";
 import { validateUserForNotification } from "../middlewares/validationMiddleware.js";
 
+export const assignTask = async (req, res) => {
+  try {
+    const taskId = req.params.id;
+    const { assignee } = req.body;
+
+    const existingTask = await Task.findById(taskId);
+
+    if (!existingTask) {
+      return res.status(404).json({ message: "Task not found." });
+    }
+
+    // Validate assignee
+    const validation = await validateUserForNotification(
+      assignee,
+      "Development Team"
+    );
+    if (!validation.isValid) {
+      return res.status(403).json({ message: validation.message });
+    }
+
+    // Update assignee field
+    existingTask.assignee = assignee;
+
+    // Trigger notification
+    if (validation.user) {
+      await sendTaskAssignmentNotification(assignee, existingTask.name);
+    }
+
+    // Save the updated task to DB
+    await existingTask.save();
+
+    res.status(200).json({ message: "Task assigned successfully." });
+  } catch (error) {
+    console.error("Error assigning task:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 export const getAllTasks = async (req, res) => {
   try {
     const tasks = await Task.find().populate("assignee dependencies sprint");
@@ -158,44 +196,6 @@ export const deleteTask = async (req, res) => {
     res.status(200).json({ message: "Task deleted successfully." });
   } catch (error) {
     console.error("Error deleting task:", error);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-};
-
-export const assignTask = async (req, res) => {
-  try {
-    const taskId = req.params.id;
-    const { assignee } = req.body;
-
-    const existingTask = await Task.findById(taskId);
-
-    if (!existingTask) {
-      return res.status(404).json({ message: "Task not found." });
-    }
-
-    // Validate assignee
-    const validation = await validateUserForNotification(
-      assignee,
-      "Development Team"
-    );
-    if (!validation.isValid) {
-      return res.status(403).json({ message: validation.message });
-    }
-
-    // Update assignee field
-    existingTask.assignee = assignee;
-
-    // Trigger notification
-    if (validation.user) {
-      await sendTaskAssignmentNotification(assignee, existingTask.name);
-    }
-
-    // Save the updated task to DB
-    await existingTask.save();
-
-    res.status(200).json({ message: "Task assigned successfully." });
-  } catch (error) {
-    console.error("Error assigning task:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };

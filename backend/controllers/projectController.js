@@ -1,42 +1,5 @@
 import { Project } from "../models/projectModel.js";
-import {sendScrumMasterProjectAssignmentNotification,sendTeamMemberProjectAssignmentNotification} from '../utils/notifications.js'
-import {validateUserForNotification} from '../middlewares/validationMiddleware.js'
-import { User } from "../models/userModels.js";
-
-// assign projects 
-export const assignProject = async (projectId, scrumMaster, teamMembers) => {
-  // Fetch the project by ID
-  const existingProject = await Project.findById(projectId);
-
-  if (!existingProject) {
-    return { success: false, message: "Project not found." };
-  }
-
-  // Update project fields
-  existingProject.scrumMaster = scrumMaster;
-  existingProject.teamMembers = teamMembers;
-
-  // Save the updated project
-  await existingProject.save();
-
-  // Trigger notification to Scrum Master
-  const scrumMasterUserValidation = await validateUserForNotification(scrumMaster, 'Scrum Master');
-  if (!scrumMasterUserValidation.isValid) {
-    return { success: false, message: scrumMasterUserValidation.message };
-  }
-  sendScrumMasterProjectAssignmentNotification(scrumMaster, existingProject.name);
-
-  // Trigger notification to team members
-  for (const teamMemberId of teamMembers) {
-    const teamMemberUserValidation = await validateUserForNotification(teamMemberId, 'Development Team');
-    if (!teamMemberUserValidation.isValid) {
-      return { success: false, message: teamMemberUserValidation.message };
-    }
-    sendTeamMemberProjectAssignmentNotification(teamMemberId, existingProject.name);
-  }
-
-  return { success: true, message: "Project assigned successfully." };
-};
+import { assignForProject} from '../utils/assignments.js'
 
 // create new project
 export const createProject = async (req, res) => {
@@ -62,7 +25,11 @@ export const createProject = async (req, res) => {
     });
 
     // Handle assinging projects
-    const assignmentResult = await assignProject(newProject._id, scrumMaster, teamMembers);
+    const assignmentResult = await assignForProject(
+      newProject._id,
+      scrumMaster,
+      teamMembers
+    );
 
     if (!assignmentResult.success) {
       return res.status(403).json({ message: assignmentResult.message });
@@ -75,7 +42,45 @@ export const createProject = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
-//get all rpojects
+
+// assign projects
+export const assignProject = async (req, res) => {
+  try {
+    const projectId = req.params.id;
+    const { scrumMaster, teamMembers } = req.body;
+
+    // Fetch the project by ID
+    const existingProject = await Project.findById(projectId);
+
+    if (!existingProject) {
+      return res.status(404).json({ message: "Project not found." });
+    }
+
+    // Update project fields
+    existingProject.scrumMaster = scrumMaster;
+    existingProject.teamMembers = teamMembers;
+
+    // Save the updated project
+    await existingProject.save();
+
+    // Handle assigning projects
+    const assignmentResult = await assignForProject(
+      projectId,
+      scrumMaster,
+      teamMembers
+    );
+
+    if (!assignmentResult.success) {
+      return res.status(403).json({ message: assignmentResult.message });
+    }
+
+    res.status(200).json({ message: "Project assigned successfully." });
+  } catch (error) {
+    console.error("Error assigning project:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+//get all  projects
 export const getAllProjects = async (req, res) => {
   try {
     const projects = await Project.find().populate(
@@ -134,7 +139,11 @@ export const updateProject = async (req, res) => {
     existingProject.tasks = tasks;
 
     // Handle assinging projects
-    const assignmentResult = await assignProject(projectId, scrumMaster, teamMembers);
+    const assignmentResult = await assignForProject(
+      projectId,
+      scrumMaster,
+      teamMembers
+    );
 
     if (!assignmentResult.success) {
       return res.status(403).json({ message: assignmentResult.message });
@@ -160,7 +169,7 @@ export const deleteProject = async (req, res) => {
 
     const existingProject = await Project.findByIdAndDelete(projectId);
     if (!existingProject) {
-      return res.status(404).json({ message: "Post not found" });
+      return res.status(404).json({ message: "Project not found" });
     }
     res.status(200).json({ message: "Project deleted successfully." });
   } catch (error) {
@@ -173,13 +182,15 @@ export const checkProjectCompletion = async (projectId) => {
   const project = await Project.findById(projectId).populate("tasks");
 
   if (!project) {
-    return { completed: false, message: 'Project not found.' };
+    return { completed: false, message: "Project not found." };
   }
 
-  const incompleteTasks = project.tasks.filter(task => task.status !== 'Done');
+  const incompleteTasks = project.tasks.filter(
+    (task) => task.status !== "Done"
+  );
 
   return {
     completed: incompleteTasks.length === 0,
-    message: 'Project completion status checked.'
+    message: "Project completion status checked.",
   };
 };
