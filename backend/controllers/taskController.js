@@ -111,6 +111,23 @@ export const updateTask = async (req, res) => {
       return res.status(404).json({ message: "Task not found." });
     }
 
+    // validate assignee
+    const assignedUser = await User.findById(assignee);
+
+    if (!assignedUser) {
+      return res.status(404).json({ message: "Assignee not found." });
+    }
+
+    if (assignedUser.role !== "Development Team") {
+      return res
+        .status(403)
+        .json({ message: "You can only assign to Development Team." });
+    }
+
+    // Trigger notification
+    if (assignedUser) {
+      await sendTaskAssignmentNotification(assignee, existingTask.name);
+    }
     // Update task fields
     existingTask.name = name;
     existingTask.description = description;
@@ -122,8 +139,12 @@ export const updateTask = async (req, res) => {
 
     // Save the updated task
     await existingTask.save();
-
-    res.status(200).json({ message: "Task updated successfully." });
+    // check task completion after update
+    const completionStatus  = await checkTaskCompletion(taskId);
+    res.status(200).json({ 
+      message: "Task updated successfully." ,
+      completionStatus
+    });
   } catch (error) {
     console.error("Error updating task:", error);
     res.status(500).json({ message: "Internal Server Error" });
