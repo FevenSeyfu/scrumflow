@@ -101,7 +101,7 @@ export const updateTask = async (req, res) => {
     } = req.body;
 
     // Find the task by ID
-    const existingTask = await Task.findById(taskId);
+    const existingTask = await Task.findById(taskId).populate("dependencies");
 
     if (!existingTask) {
       return res.status(404).json({ message: "Task not found." });
@@ -147,7 +147,7 @@ export const assignTask = async (req, res) => {
     const taskId = req.params.id;
     const { assignee } = req.body;
     // Find the task by ID
-    const existingTask = await Task.findById(taskId);
+    const existingTask = await Task.findById(taskId).populate("dependencies");
 
     if (!existingTask) {
       return res.status(404).json({ message: 'Task not found.' });
