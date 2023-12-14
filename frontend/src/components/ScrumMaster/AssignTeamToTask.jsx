@@ -1,7 +1,9 @@
 import React from 'react'
 
-export const AssignTeamToTask = () => {
+const AssignTeamToTask = () => {
   return (
     <div>AssignTeamToTask</div>
   )
 }
+
+export default AssignTeamToTask

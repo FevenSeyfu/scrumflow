@@ -1,8 +1,14 @@
 import React from 'react'
+import UpdateUserProfile from './UpdateUserProfile'
+import UserList from './UserList'
+import Layout from '../common/Layout'
 
 const Dashboard = () => {
   return (
-    <div>Dashboard</div>
+    <Layout>
+        <UpdateUserProfile />
+        <UserList />
+    </Layout>
   )
 }
 

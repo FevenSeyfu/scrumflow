@@ -1,8 +1,16 @@
 import React from 'react'
+import Layout from '../common/Layout'
+import AddTask from './AddTask'
+import ProjectDetail from './ProjectDetail'
+import AssignTeam from './AssignTeam'
 
 const Dashboard = () => {
   return (
-    <div>Dashboard</div>
+    <Layout>
+        <AddTask />
+        <ProjectDetail />
+        <AssignTeam />
+    </Layout>
   )
 }
 
