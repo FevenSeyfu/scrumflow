@@ -47,9 +47,9 @@ const Login = () => {
     dispatch(login(userData));
   };
   return (
-    <div className="max-w-6xl w-5/6 flex rounded-2xl items-center justify-center  bg-light-gray shadow-md ">
-      <div className="w-full px-6 md:w-2/6 mx-8 md:mb-0 ">
-        <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
+    <div className="w-2/5  m-auto flex justify-center my-12 py-8 rounded-2xl  bg-dark-blue text-white shadow-md ">
+      <div className="w-full flex flex-col justify-center items-center px-8">
+        <h2 className="text-3xl font-extrabold mb-4 text-center">Login</h2>
         {isLoading ? <Spinner /> : ""}
         <form onSubmit={onSubmit}>
           <div className="mb-4">
@@ -71,7 +71,7 @@ const Login = () => {
           <div className="mb-4">
             <label
               htmlFor="password"
-              className="block text-sm font-medium text-gray"
+              className="block text-sm font-medium text-light-gray"
             >
               Password
             </label>
@@ -79,7 +79,7 @@ const Login = () => {
               type="password"
               id="password"
               name="password"
-              className="mt-1 p-2 w-full border rounded-md"
+              className="mt-1 p-2 w-full border rounded-md text-black"
               value={password}
               onChange={onChange}
             />
@@ -112,7 +112,7 @@ const Login = () => {
         </form>
         <p className="text-gray">
           Don't have an accound?
-          <Link to="/users/" className="text-soft-orange hover:underline">
+          <Link to="/users/" className="text-olive-green hover:underline">
             Register
           </Link>
         </p>

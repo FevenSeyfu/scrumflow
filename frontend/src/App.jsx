@@ -19,6 +19,7 @@ const App = () => {
         <Route path="/users/profile" element={<UserProfile/>} />
 
       </Routes>
+      <ToastContainer />
     </>
   )
 }
