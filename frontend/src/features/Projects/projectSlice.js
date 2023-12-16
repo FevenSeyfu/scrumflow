@@ -142,7 +142,7 @@ export const projectSlice = createSlice({
         state.isError = true;
         state.message = action.payload;
       })
-      addCase(updateProject.pending, (state) => {
+      .addCase(updateProject.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(updateProject.fulfilled, (state, action) => {
@@ -150,10 +150,27 @@ export const projectSlice = createSlice({
         state.isSuccess = true;
         const updateProject = action.payload;
         state.projects = state.projects.map((project) =>
-        project._id === updateProject._id ? updateProject : project
+          project._id === updateProject._id ? updateProject : project
         );
       })
       .addCase(updateProject.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+      })
+      //   assign to a project
+      .addCase(assignProject.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(assignProject.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        const updateProject = action.payload;
+        state.projects = state.projects.map((project) =>
+          project._id === updateProject._id ? updateProject : project
+        );
+      })
+      .addCase(assignProject.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload;
@@ -173,6 +190,6 @@ export const projectSlice = createSlice({
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload;
-      })
+      });
   },
 });
