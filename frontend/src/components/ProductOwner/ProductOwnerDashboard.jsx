@@ -4,7 +4,7 @@ import AddTask from './AddTask'
 import ProjectDetail from './ProjectDetail'
 import AssignTeam from './AssignTeam'
 
-const Dashboard = () => {
+const ProductOwnerDashboard = () => {
   return (
     <Layout>
         <AddTask />
@@ -14,4 +14,4 @@ const Dashboard = () => {
   )
 }
 
-export default Dashboard
+export default ProductOwnerDashboard

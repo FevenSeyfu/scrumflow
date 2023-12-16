@@ -3,7 +3,7 @@ import UpdateUserProfile from './UpdateUserProfile'
 import UserList from './UserList'
 import Layout from '../common/Layout'
 
-const Dashboard = () => {
+const AdminDashboard = () => {
   return (
     <Layout>
         <UpdateUserProfile />
@@ -12,4 +12,4 @@ const Dashboard = () => {
   )
 }
 
-export default Dashboard
+export default AdminDashboard

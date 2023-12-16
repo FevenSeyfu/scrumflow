@@ -256,7 +256,6 @@ const Register = () => {
                   />
                   Development Team
                 </label>
-                {/*  */}
                 {/* <label className="whitespace-nowrap">
                   <input
                     type="radio"
