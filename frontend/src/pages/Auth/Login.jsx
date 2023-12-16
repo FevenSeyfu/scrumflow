@@ -49,7 +49,7 @@ const Login = () => {
   return (
     <div className="w-2/5  m-auto flex justify-center my-12 py-8 rounded-2xl  bg-dark-blue text-white shadow-md ">
       <div className="w-full flex flex-col justify-center items-center px-8">
-        <h2 className="text-3xl font-extrabold mb-4 text-center">Login</h2>
+        <h2 className="text-3xl font-extrabold mb-4 text-center">Sign In</h2>
         {isLoading ? <Spinner /> : ""}
         <form onSubmit={onSubmit}>
           <div className="mb-4">
@@ -63,7 +63,7 @@ const Login = () => {
               type="text"
               id="email"
               name="email"
-              className="mt-1 p-2 w-full border rounded-md"
+              className="mt-1 p-2 w-full border rounded-md text-black"
               value={email}
               onChange={onChange}
             />
@@ -107,13 +107,13 @@ const Login = () => {
             type="submit"
             className="w-3/6 text-white  bg-olive-green rounded-2xl mt-4 py-2 ml-12 mb-2"
           >
-            Login
+            Sign In
           </button>
         </form>
         <p className="text-gray">
           Don't have an accound?
           <Link to="/users/" className="text-olive-green hover:underline">
-            Register
+            Sign Up
           </Link>
         </p>
       </div>

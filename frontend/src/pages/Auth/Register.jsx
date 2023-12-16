@@ -100,9 +100,9 @@ const Register = () => {
     dispatch(register(userData));
   };
   return (
-    <div className="w-2/5  m-auto flex justify-center my-8 py-8 rounded-2xl  bg-dark-blue text-white shadow-md ">
+    <div className="w-2/5  m-auto flex justify-center my-8 py-8 px-8 rounded-2xl  bg-dark-blue text-white shadow-md ">
       <div className="w-full flex flex-col justify-center items-center px-8">
-        <h2 className="text-2xl font-bolder mb-2 text-center">Register</h2>
+        <h2 className="text-2xl font-bolder mb-2 text-center">Sign up</h2>
         {isLoading ? <Spinner /> : ""}
         <form onSubmit={onSubmit}>
           <div className="flex flex-row justify-between gap-2 pb-1">
@@ -117,7 +117,7 @@ const Register = () => {
                 type="text"
                 id="firstName"
                 name="firstName"
-                className="mt-1  w-full border-2 focus:border-2 rounded-md p-1 text-black"
+                className="mt-1  w-full border focus:border rounded-md p-1 text-black"
                 value={firstName}
                 onChange={onChange}
                 required
@@ -134,7 +134,7 @@ const Register = () => {
                 type="text"
                 id="lastName"
                 name="lastName"
-                className="mt-1 w-full border-2 focus:border-2 rounded-md p-1 text-black"
+                className="mt-1 w-full border focus:border rounded-md p-1 text-black"
                 value={lastName}
                 onChange={onChange}
                 required
@@ -153,7 +153,7 @@ const Register = () => {
                 type="text"
                 id="username"
                 name="username"
-                className="mt-1  w-full border-2 focus:border-2 rounded-md p-1 text-black"
+                className="mt-1  w-full border focus:border rounded-md p-1 text-black"
                 value={username}
                 onChange={onChange}
                 required
@@ -170,7 +170,7 @@ const Register = () => {
                 type="date"
                 id="birthDate"
                 name="birthDate"
-                className="mt-1 w-full border-2 focus:border-2 rounded-md p-1 text-black"
+                className="mt-1 w-full border focus:border rounded-md p-1 text-black"
                 value={birthDate}
                 onChange={onChange}
                 required
@@ -189,7 +189,7 @@ const Register = () => {
                 type="email"
                 id="email"
                 name="email"
-                className="mt-1 w-full border-2 focus:border-2 rounded-md p-1 text-black"
+                className="mt-1 w-full border focus:border rounded-md p-1 text-black"
                 value={email}
                 onChange={onChange}
                 required
@@ -217,7 +217,7 @@ const Register = () => {
           <div className="flex flex-row justify-between items-start mb-4">
             <div className="flex flex-row items-start">
               {/* Radio buttons for user roles */}
-              <label className="text-sm font-medium text-white mr-4 ">
+              <label className="text-sm font-medium text-white mr-2 ">
                 Select Role:
               </label>
               <div className="flex flex-row w-4/5 gap-4 flex-wrap">
@@ -257,7 +257,7 @@ const Register = () => {
                   Development Team
                 </label>
                 {/*  */}
-                <label className="whitespace-nowrap">
+                {/* <label className="whitespace-nowrap">
                   <input
                     type="radio"
                     id="admin"
@@ -267,7 +267,7 @@ const Register = () => {
                     onChange={onChange}
                   />
                   Admin
-                </label>
+                </label> */}
               </div>
             </div>
           </div>
@@ -277,8 +277,7 @@ const Register = () => {
               <img
                 src={profileImage}
                 alt="Profile Preview"
-                className="mt-1 rounded-md"
-                style={{ maxWidth: "100%" }}
+                className="mt-1 rounded-md h-40 w-auto"
               />
             )}
             <label
@@ -291,7 +290,7 @@ const Register = () => {
               type="file"
               id="profileImage"
               name="profileImage"
-              className="mt-1 w-full border-2 focus:border-2 rounded-md"
+              className="mt-1 w-full border focus:border rounded-md"
               onChange={onChange}
             />
             
@@ -317,7 +316,7 @@ const Register = () => {
                     to="/users/login"
                     className="text-olive-green hover:underline"
                   >
-                    Login
+                    Sign In
                   </Link>
                 </p>
               </div>
@@ -328,7 +327,7 @@ const Register = () => {
               type="submit"
               className="text-white  bg-olive-green py-2 px-4 rounded-lg"
             >
-              Register
+              Signup
             </button>
           </div>
         </form>

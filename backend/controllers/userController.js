@@ -12,6 +12,7 @@ export const registerUser = async (req, res) => {
       username,
       firstName,
       lastName,
+      profileImage,
       birthDate,
       email,
       password,
@@ -40,6 +41,7 @@ export const registerUser = async (req, res) => {
       email,
       password: hashedPassword,
       role,
+      profileImage,
       isAdmin
     });
     const user = await User.create(newUser);
@@ -79,6 +81,7 @@ export const loginUser = async (req, res) => {
       username: user.username,
       firstName: user.firstName,
       lastName: user.lastName,
+      profileImage:user.profileImage,
       birthDate: user.birthDate,
       email: user.email,
       role: user.role,
