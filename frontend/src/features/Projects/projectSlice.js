@@ -165,9 +165,9 @@ export const projectSlice = createSlice({
       .addCase(assignProject.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        const updateProject = action.payload;
+        const assignProject = action.payload;
         state.projects = state.projects.map((project) =>
-          project._id === updateProject._id ? updateProject : project
+          project._id === updateProject._id ? assignProject : project
         );
       })
       .addCase(assignProject.rejected, (state, action) => {
