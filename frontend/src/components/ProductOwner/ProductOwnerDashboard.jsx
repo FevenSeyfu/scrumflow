@@ -7,6 +7,7 @@ import AssignTeam from './AssignTeam'
 const ProductOwnerDashboard = () => {
   return (
     <Layout>
+        Product owner
         <AddTask />
         <ProjectDetail />
         <AssignTeam />

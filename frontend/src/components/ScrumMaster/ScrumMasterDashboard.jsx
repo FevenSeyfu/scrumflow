@@ -9,6 +9,7 @@ import TaskManagement from './TaskManagement'
 const ScrumMasterDashboard = () => {
   return (
     <Layout>
+      scrum master
         <AssignTeamToTask />
         <CreateTask />
         <ProjectDetails />

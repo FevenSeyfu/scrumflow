@@ -6,6 +6,7 @@ import UpdateTask from './UpdateTask'
 const DevelopmentTeamDashboard = () => {
   return (
     <Layout>
+      Dev Team
       <TaskDetails />
       <UpdateTask />
     </Layout>

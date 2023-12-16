@@ -1,7 +1,9 @@
 import React from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { Routes, Route, Navigate } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 import Home from "./pages/Home";
 // auth pages
 import Register from "./pages/Auth/Register";
@@ -43,7 +45,7 @@ const App = () => {
           }
         />
       </Routes>
-      <ToastContainer />
+      <ToastContainer className='top-left' />
     </>
   );
 };

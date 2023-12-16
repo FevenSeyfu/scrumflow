@@ -24,6 +24,7 @@ const Login = () => {
       toast.error(message);
     }
     if (isSuccess || user) {
+      toast.success(message)
       navigate("/dashboard");
     }
 
@@ -60,12 +61,13 @@ const Login = () => {
               Email
             </label>
             <input
-              type="text"
+              type="email"
               id="email"
               name="email"
               className="mt-1 p-2 w-full border rounded-md text-black"
               value={email}
               onChange={onChange}
+              required
             />
           </div>
           <div className="mb-4">
@@ -82,6 +84,7 @@ const Login = () => {
               className="mt-1 p-2 w-full border rounded-md text-black"
               value={password}
               onChange={onChange}
+              required
             />
           </div>
           <div className="flex items-center mb-4">
