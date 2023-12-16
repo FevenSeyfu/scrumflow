@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createProject,reset } from '../../features/Projects/projectSlice'
-import Select from "react-select"; 
+import { createProject, reset } from "../../features/Projects/projectSlice";
+import Select from "react-select";
 
 const CreateProject = () => {
   const dispatch = useDispatch();
@@ -12,7 +12,7 @@ const CreateProject = () => {
     scrumMaster: "",
     teamMembers: [],
     tasks: [],
-    status:'open'
+    status: "open",
   });
   const [scrumMasterOptions, setScrumMasterOptions] = useState([]);
   const [devTeamOptions, setDevTeamOptions] = useState([]);
@@ -26,24 +26,55 @@ const CreateProject = () => {
       .filter((user) => user.role === "Scrum Master")
       .map((user) => ({
         value: user._id,
-        label: user.username, 
+        label: user.username,
       }));
-      setScrumMasterOptions(ScrumOptions);
+    setScrumMasterOptions(ScrumOptions);
 
-      // add options for the Team memebers dropdown
+    // add options for the Team memebers dropdown
     const devOptions = users
-    .filter((user) => user.role === "Development Team")
-    .map((user) => ({
-      value: user._id,
-      label: user.username, 
-    }));
+      .filter((user) => user.role === "Development Team")
+      .map((user) => ({
+        value: user._id,
+        label: user.username,
+      }));
     setDevTeamOptions(devOptions);
-    }, [users]);
+  }, [users]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setProjectData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+  const handleScrumMasterChange = (selectedOption) => {
+    setProjectData((prevData) => ({
+      ...prevData,
+      scrumMaster: selectedOption,
+    }));
+  };
+
+  const handleTeamMemeberChange= (selectedOption) => {
+    setProjectData((prevData) => ({
+      ...prevData,
+      teamMembers: selectedOption,
+    }));
+  };
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    // get ScrumMaster's id
+    const scrumMasterId =
+      projectData.scrumMaster && projectData.scrumMaster.value;
+    // fetch selected development team member's Id
+    const teamMembers = projectData.teamMembers && projectData.teamMembers.value
+    
+    dispatch(createProject({ ...projectData, scrumMaster: scrumMasterId, teamMembers:devTeamID }));
+  };
   return (
     <div>
       <h2>Create New Projects</h2>
       <form onSubmit={handleFormSubmit}>
-      <label htmlFor="name">Name:</label>
+        <label htmlFor="name">Name:</label>
         <input
           type="text"
           id="name"
@@ -88,7 +119,7 @@ const CreateProject = () => {
         </button>
       </form>
     </div>
-  )
-}
+  );
+};
 
-export default CreateProject
+export default CreateProject;
