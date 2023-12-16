@@ -83,7 +83,8 @@ export const assignProject = async (req, res) => {
 //get all  projects
 export const getAllProjects = async (req, res) => {
   try {
-    const projects = await Project.find().populate(
+    const { projectOwnerId } = request.params;
+    const projects = await Project.find({projectOwner:projectOwnerId}).populate(
       "projectOwner scrumMaster teamMembers tasks"
     );
     res.status(200).json(projects);
