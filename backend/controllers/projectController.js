@@ -148,11 +148,13 @@ export const updateProject = async (req, res) => {
     if (!assignmentResult.success) {
       return res.status(403).json({ message: assignmentResult.message });
     }
-    // save the updated project to database
-    await existingProject.save();
-
+   
     // Check project completion after update
     const completionStatus = await checkProjectCompletion(projectId);
+    existingProject.status = completionStatus.completed ? 'completed' : 'open';
+     // save the updated project to database
+     await existingProject.save();
+
     res.status(200).json({
       message: "Project updated successfully.",
       completionStatus,
