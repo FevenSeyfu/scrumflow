@@ -2,13 +2,23 @@ import axios from "axios";
 
 const API_URL = 'https://scrum-flow.onrender.com/api/users';
 
-const getAllUsers = async () => {
-    const response = await axios.get(API_URL);
+const getAllUsers = async (token) => {
+    const config = {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    };
+    const response = await axios.get(API_URL,config);
     return response.data;
 };
 
-const getUserById = async (userId) => {
-    const response = await axios.get(`${API_URL}/${userId}`);
+const getUserById = async (userId,token) => {
+    const config = {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    };
+    const response = await axios.get(`${API_URL}/${userId}`,config);
     return response.data;
 };
 

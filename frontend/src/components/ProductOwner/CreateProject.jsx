@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createProject, reset } from "../../features/Projects/projectSlice";
+import {getAllUsers,reset} from '../../features/users/userSlice'
 import Select from "react-select";
 
 const CreateProject = () => {
@@ -20,7 +21,7 @@ const CreateProject = () => {
 
   useEffect(() => {
     // dispatch getallusers
-
+    const users = await dispatch(getAllUsers)
     // add options for the Scrum Master dropdown
     const ScrumOptions = users
       .filter((user) => user.role === "Scrum Master")
