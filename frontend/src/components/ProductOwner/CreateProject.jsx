@@ -61,12 +61,15 @@ const CreateProject = () => {
   };
 
   const handleTeamMemeberChange = (selectedOptions) => {
-    const selectedValues = selectedOptions.map((option) => option.value);
-
-  setProjectData((prevData) => ({
-    ...prevData,
-    teamMembers: selectedValues,
-  }));
+    const selectedValues = selectedOptions.map((option) => ({
+      value: option.value,
+      label: option.label,
+    }));
+  
+    setProjectData((prevData) => ({
+      ...prevData,
+      teamMembers: selectedValues,
+    }));
   };
 
   const handleFormSubmit = (e) => {
@@ -75,13 +78,13 @@ const CreateProject = () => {
     const scrumMasterId =
       projectData.scrumMaster && projectData.scrumMaster.value;
     // fetch selected development team member's Id
-    const devTeamID = projectData.teamMembers && projectData.teamMembers.value;
+    const devTeamIDs = projectData.teamMembers?.map((member) => member.value) || [];
 
     dispatch(
       createProject({
         ...projectData,
         scrumMaster: scrumMasterId,
-        teamMembers: devTeamID,
+        teamMembers: devTeamIDs,
       })
     );
     if (isError) {
