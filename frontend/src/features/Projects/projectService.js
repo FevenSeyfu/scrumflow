@@ -49,7 +49,7 @@ const assignProject = async (projectData,project_id,token) => {
             Authorization: `Bearer ${token}`,
         },
     }
-    const response = await axios.put(`${PROJECT_URL}${project_id}/assign}`,projectData,config)
+    const response = await axios.put(`${PROJECT_URL}${project_id}/assign`, projectData, config);
     return response.data
 }
 // router.delete('/:id',protect, deleteProject);

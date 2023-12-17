@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createProject, reset } from "../../features/Projects/projectSlice";
+import { createProject,reset } from "../../features/Projects/projectSlice";
+import { getAllUsers } from "../../features/users/userSlice";
 import Select from "react-select";
+import { toast } from "react-toastify";
 
 const CreateProject = () => {
   const dispatch = useDispatch();
+  const { users, isLoading,isError,isSuccess } = useSelector((state) => state.users);
   const [projectData, setProjectData] = useState({
     name: "",
     description: "",
@@ -16,12 +19,14 @@ const CreateProject = () => {
   });
   const [scrumMasterOptions, setScrumMasterOptions] = useState([]);
   const [devTeamOptions, setDevTeamOptions] = useState([]);
-  // const { name,description,startDate,scrumMaster,teamMembers,tasks,status } = projectData;
 
   useEffect(() => {
     // dispatch getallusers
+    dispatch(getAllUsers());
+  }, [dispatch]);
 
-    // add options for the Scrum Master dropdown
+  useEffect(() => {
+    // add options for the Scrum Master Selection
     const ScrumOptions = users
       .filter((user) => user.role === "Scrum Master")
       .map((user) => ({
@@ -30,7 +35,7 @@ const CreateProject = () => {
       }));
     setScrumMasterOptions(ScrumOptions);
 
-    // add options for the Team memebers dropdown
+    // add options for the Team members dropdown
     const devOptions = users
       .filter((user) => user.role === "Development Team")
       .map((user) => ({
@@ -38,7 +43,7 @@ const CreateProject = () => {
         label: user.username,
       }));
     setDevTeamOptions(devOptions);
-  }, [users]);
+  }, [users,isLoading,isError, isSuccess]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -47,6 +52,7 @@ const CreateProject = () => {
       [name]: value,
     }));
   };
+
   const handleScrumMasterChange = (selectedOption) => {
     setProjectData((prevData) => ({
       ...prevData,
@@ -54,22 +60,41 @@ const CreateProject = () => {
     }));
   };
 
-  const handleTeamMemeberChange= (selectedOption) => {
+  const handleTeamMemeberChange = (selectedOptions) => {
+    const selectedValues = selectedOptions.map((option) => ({
+      value: option.value,
+      label: option.label,
+    }));
+  
     setProjectData((prevData) => ({
       ...prevData,
-      teamMembers: selectedOption,
+      teamMembers: selectedValues,
     }));
   };
+
   const handleFormSubmit = (e) => {
     e.preventDefault();
     // get ScrumMaster's id
     const scrumMasterId =
       projectData.scrumMaster && projectData.scrumMaster.value;
     // fetch selected development team member's Id
-    const teamMembers = projectData.teamMembers && projectData.teamMembers.value
-    
-    dispatch(createProject({ ...projectData, scrumMaster: scrumMasterId, teamMembers:devTeamID }));
+    const devTeamIDs = projectData.teamMembers?.map((member) => member.value) || [];
+
+    dispatch(
+      createProject({
+        ...projectData,
+        scrumMaster: scrumMasterId,
+        teamMembers: devTeamIDs,
+      })
+    );
+    if (isError) {
+      toast.error(message);
+    }
+    if (isSuccess) {
+      toast.success('Project created successfully')
+    }
   };
+
   return (
     <div>
       <h2>Create New Projects</h2>
@@ -93,9 +118,9 @@ const CreateProject = () => {
         <label htmlFor="description">StartDate:</label>
         <input
           type="date"
-          id="StartDate"
-          name="StartDate"
-          value={projectData.StartDate}
+          id="startDate"
+          name="startDate"
+          value={projectData.startDate}
           onChange={handleInputChange}
         />
         <label htmlFor="scrumMaster">Scrum Master:</label>
@@ -106,13 +131,14 @@ const CreateProject = () => {
           onChange={handleScrumMasterChange}
           options={scrumMasterOptions}
         />
-        <label htmlFor="teamMembers">Scrum Master:</label>
+        <label htmlFor="teamMembers">Development Team:</label>
         <Select
           id="teamMembers"
           name="teamMembers"
           value={projectData.teamMembers}
           onChange={handleTeamMemeberChange}
           options={devTeamOptions}
+          isMulti
         />
         <button type="submit" disabled={isLoading}>
           {isLoading ? "Creating..." : "Create Project"}

@@ -167,7 +167,7 @@ export const projectSlice = createSlice({
         state.isSuccess = true;
         const assignProject = action.payload;
         state.projects = state.projects.map((project) =>
-          project._id === updateProject._id ? assignProject : project
+          project._id === assignProject._id ? assignProject : project
         );
       })
       .addCase(assignProject.rejected, (state, action) => {
@@ -175,6 +175,7 @@ export const projectSlice = createSlice({
         state.isError = true;
         state.message = action.payload;
       })
+      // delete project
       .addCase(deleteProject.pending, (state) => {
         state.isLoading = true;
       })
@@ -193,3 +194,6 @@ export const projectSlice = createSlice({
       });
   },
 });
+
+export const { reset } = projectSlice.actions;
+export default projectSlice.reducer;
