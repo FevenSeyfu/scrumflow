@@ -6,9 +6,10 @@ import ProjectDetails from './ProjectDetails'
 import SprintManagement from './SprintManagement'
 import TaskManagement from './TaskManagement'
 
-const Dashboard = () => {
+const ScrumMasterDashboard = () => {
   return (
     <Layout>
+      scrum master
         <AssignTeamToTask />
         <CreateTask />
         <ProjectDetails />
@@ -18,4 +19,4 @@ const Dashboard = () => {
   )
 }
 
-export default Dashboard
+export default ScrumMasterDashboard

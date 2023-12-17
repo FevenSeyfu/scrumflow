@@ -3,10 +3,12 @@ import Layout from '../common/Layout'
 import AddTask from './AddTask'
 import ProjectDetail from './ProjectDetail'
 import AssignTeam from './AssignTeam'
+import CreateProject from './CreateProject'
 
-const Dashboard = () => {
+const ProductOwnerDashboard = () => {
   return (
     <Layout>
+        <CreateProject />
         <AddTask />
         <ProjectDetail />
         <AssignTeam />
@@ -14,4 +16,4 @@ const Dashboard = () => {
   )
 }
 
-export default Dashboard
+export default ProductOwnerDashboard

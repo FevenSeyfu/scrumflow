@@ -3,13 +3,14 @@ import Layout from '../common/Layout'
 import TaskDetails from './TaskDetails'
 import UpdateTask from './UpdateTask'
 
-const Dashboard = () => {
+const DevelopmentTeamDashboard = () => {
   return (
     <Layout>
+      Dev Team
       <TaskDetails />
       <UpdateTask />
     </Layout>
   )
 }
 
-export default Dashboard
+export default DevelopmentTeamDashboard

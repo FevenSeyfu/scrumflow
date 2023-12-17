@@ -83,7 +83,8 @@ export const assignProject = async (req, res) => {
 //get all  projects
 export const getAllProjects = async (req, res) => {
   try {
-    const projects = await Project.find().populate(
+    const { projectOwnerId } = request.params;
+    const projects = await Project.find({projectOwner:projectOwnerId}).populate(
       "projectOwner scrumMaster teamMembers tasks"
     );
     res.status(200).json(projects);
@@ -148,11 +149,13 @@ export const updateProject = async (req, res) => {
     if (!assignmentResult.success) {
       return res.status(403).json({ message: assignmentResult.message });
     }
-    // save the updated project to database
-    await existingProject.save();
-
+   
     // Check project completion after update
     const completionStatus = await checkProjectCompletion(projectId);
+    existingProject.status = completionStatus.completed ? 'completed' : 'open';
+     // save the updated project to database
+     await existingProject.save();
+
     res.status(200).json({
       message: "Project updated successfully.",
       completionStatus,

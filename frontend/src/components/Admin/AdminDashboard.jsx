@@ -3,13 +3,14 @@ import UpdateUserProfile from './UpdateUserProfile'
 import UserList from './UserList'
 import Layout from '../common/Layout'
 
-const Dashboard = () => {
+const AdminDashboard = () => {
   return (
     <Layout>
+      admin
         <UpdateUserProfile />
         <UserList />
     </Layout>
   )
 }
 
-export default Dashboard
+export default AdminDashboard

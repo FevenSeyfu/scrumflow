@@ -21,6 +21,11 @@ const projectSchema = new mongoose.Schema({
     },
   ],
   tasks: [{ type: mongoose.Schema.Types.ObjectId, ref: "Task" }],
+  status: {
+    type: String,
+    enum: ["open", "onhold", "completed"],
+    default: "open",
+  },
 });
 
 export const Project = mongoose.model("Project", projectSchema);
