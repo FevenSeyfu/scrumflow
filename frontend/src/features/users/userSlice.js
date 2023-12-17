@@ -79,7 +79,7 @@ export const deleteUser = createAsyncThunk(
 );
 
 export const userSlice = createSlice({
-    name: "user",
+    name: "users",
     initialState,
     reducers: {
         reset: (state) => {
