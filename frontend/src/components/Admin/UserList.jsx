@@ -177,8 +177,8 @@ const UsersList = () => {
   };
 
   return (
-    <div>
-      <h1 className="text-3xl mb-4">Users List</h1>
+    <div className="flex flex-col justify-center">
+      <h1 className="text-3xl mb-4 text-center mx-8">Users List</h1>
       {showUpdateModal && (
         <UpdateUser userId={selectedUserId} onClose={() => setShowUpdateModal(false)} />
       )}

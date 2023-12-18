@@ -110,7 +110,7 @@ const UpdateUser = ({ userId, onClose }) => {
     if(isSuccess){
       setUpdatedData({});
       onClose();
-      toast.success(message)
+      toast.success('User Profile updated successfully')
       dispatch(getAllUsers)
     }
   };
