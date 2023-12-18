@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { updateUser, getUserById, reset } from "../../features/users/userSlice";
+import { updateUser, getUserById, reset, getAllUsers } from "../../features/users/userSlice";
 import imageCompression from "browser-image-compression";
 import Modal from "react-modal";
 import { toast } from "react-toastify";
@@ -11,7 +11,7 @@ Modal.setAppElement("#root");
 
 const UpdateUser = ({ userId, onClose }) => {
   const dispatch = useDispatch();
-  const { user, isLoading, isError, isSuccess,message } = useSelector(
+  const { user,users, isLoading, isError, isSuccess,message } = useSelector(
     (state) => state.users
   );
   const [updatedData, setUpdatedData] = useState({
@@ -52,6 +52,14 @@ const UpdateUser = ({ userId, onClose }) => {
     fetchUserData();
   }, [dispatch, userId]);
 
+  // change date format  
+  const handleDate = (dateInput) => {
+    const date = new Date(dateInput);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
   const onChange = async (e) => {
     if (e.target.name === "profileImage") {
       const file = e.target.files[0];
@@ -102,7 +110,8 @@ const UpdateUser = ({ userId, onClose }) => {
     if(isSuccess){
       setUpdatedData({});
       onClose();
-      toast.success()
+      toast.success(message)
+      dispatch(getAllUsers)
     }
   };
   return (
@@ -119,6 +128,7 @@ const UpdateUser = ({ userId, onClose }) => {
           <MdClose size={30} onClick={onClose} />
         </div>
         <h2 className="font-bold text-2xl text-center mb-12">Update User</h2>
+        {isLoading && <FaSpinner />}
         <form onSubmit={handleSubmit} className="flex flex-col ">
           <label htmlFor="firstName" className="mr-2">
             First name:
@@ -155,7 +165,7 @@ const UpdateUser = ({ userId, onClose }) => {
             <input
               type="date"
               name="birthDate"
-              value={updatedData.birthDate}
+              value={handleDate(updatedData.birthDate)}
               onChange={onChange}
               className="border-2 rounded-md ml-2 focus:outline-olive-green my-2"
             />
