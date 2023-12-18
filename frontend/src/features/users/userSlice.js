@@ -3,6 +3,7 @@ import userService from "./userService";
 
 const initialState = {
     users: [],
+    user:null,
     isError: false,
     isSuccess: false,
     isLoading: false,
@@ -87,6 +88,7 @@ export const userSlice = createSlice({
             state.isError = false;
             state.isSuccess = false;
             state.message = "";
+            state.user = null
         },
     },
     extraReducers: (builder) => {

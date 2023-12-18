@@ -4,13 +4,14 @@ import { getAllUsers, reset } from "../../features/users/userSlice";
 import { FaSpinner, FaEdit, FaUserCircle,FaTrash } from "react-icons/fa";
 import UpdateUser from './UpdateUser'
 import DeleteUser from'./DeleteUser'
+import { toast } from "react-toastify";
 
 const UsersList = () => {
   const dispatch = useDispatch();
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
-  const { users, isLoading, isError, isSuccess } = useSelector(
+  const { users, isLoading, isError, isSuccess,message } = useSelector(
     (state) => state.users
   );
 
@@ -34,13 +35,15 @@ const UsersList = () => {
   const handleRole = (role) => {
     setSelectedRole(role);
   };
-  const developmentTeamUsers = users.filter(
-    (user) => user.role === "Development Team"
-  );
-  const projectOwnerUsers = users.filter(
-    (user) => user.role === "Product Owner"
-  );
-  const scrumMasterUsers = users.filter((user) => user.role === "Scrum Master");
+  const developmentTeamUsers = Array.isArray(users)
+  ? users.filter((user) => user.role === "Development Team")
+  : [];
+  const projectOwnerUsers = Array.isArray(users)
+  ? users.filter((user) => user.role === "Product Owner")
+  : [];
+  const scrumMasterUsers = Array.isArray(users)
+  ? users.filter((user) => user.role === "Scrum Master")
+  : [];
   // displaying grouped and sorted users
   const renderUsers = () => {
     let filteredUsers = [];
@@ -65,7 +68,7 @@ const UsersList = () => {
       return <FaSpinner />;
     }
 
-    if (isError) {
+    if (isError && message) {
       return toast.error(message);
     }
 
@@ -125,7 +128,7 @@ const UsersList = () => {
                       <img
                         src={user.profileImage}
                         alt="profile picture"
-                        className="rounded-full w-12 h-12"
+                        className="rounded-full w-8 h-8"
                       />
                     ) : (
                       <FaUserCircle size={24} className="text-dark-blue" />
@@ -143,32 +146,28 @@ const UsersList = () => {
                     {user.updatedAt && handleDate(user.updatedAt)}
                   </td>
                   <td className=" p-2 flex flex-row justify-between">
-                    <FaEdit 
-                    className="text-green" 
-                    onClick={()=>{
-                      setSelectedUserId(user._id)
-                      setShowUpdateModal(true)}
-                      }/>
-                    <FaTrash 
-                    className="text-red" 
-                    onClick={()=>{
-                      setSelectedUserId(user._id)
-                      setShowDeleteModal(true)}
-                      }/>
+                  <FaEdit
+                    className="text-green"
+                    onClick={() => {
+                      setSelectedUserId(user._id);
+                      setShowUpdateModal(true);
+                      setShowDeleteModal(false); 
+                    }}
+                  />
+                  <FaTrash
+                    className="text-red"
+                    onClick={() => {
+                      setSelectedUserId(user._id);
+                      setShowDeleteModal(true);
+                      setShowUpdateModal(false); 
+                    }}
+                  />
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-          {
-            showUpdateModal && (
-              <UpdateUser userId={selectedUserId} onClose={() => setShowUpdateModal(false)}/>
-            ) ||
-            showDeleteModal && (
-              <DeleteUser userId={selectedUserId} onClose={() => setShowDeleteModal(false)}/>
-            )
-          }
-        </div>
+          </div>
       );
     }
 
@@ -178,7 +177,15 @@ const UsersList = () => {
   return (
     <div>
       <h1 className="text-3xl mb-4">Users List</h1>
+      {showUpdateModal && (
+        <UpdateUser userId={selectedUserId} onClose={() => setShowUpdateModal(false)} />
+      )}
+
+      {showDeleteModal && (
+        <DeleteUser userId={selectedUserId} onClose={() => setShowDeleteModal(false)} />
+      )}
       {renderUsers()}
+      
     </div>
   );
 };
