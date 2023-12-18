@@ -45,7 +45,7 @@ const App = () => {
           }
         />
       </Routes>
-      <ToastContainer className='top-left' />
+      <ToastContainer/>
     </>
   );
 };

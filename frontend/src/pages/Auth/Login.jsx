@@ -23,13 +23,16 @@ const Login = () => {
     if (isError) {
       toast.error(message);
     }
+  
     if (isSuccess || user) {
-      toast.success(message)
+      if (message) {
+        toast.success(message);
+      }
       navigate("/dashboard");
     }
-
+  
     dispatch(reset());
-  }, [user, isError, isSuccess, message, navigate, dispatch]);
+  }, [user, isError, isSuccess, message]);
 
   const onChange = (e) => {
     setFormData((prevState) => ({

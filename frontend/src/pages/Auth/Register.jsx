@@ -40,6 +40,9 @@ const Register = () => {
       toast.error(message);
     }
     if (isSuccess || user) {
+      if (message) {
+        toast.success(message);
+      }
       navigate("/users/login");
       dispatch(reset());
     }
