@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllUsers, reset } from "../../features/users/userSlice";
-import { FaSpinner, FaEdit,FaUserCircle } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { FaSpinner, FaEdit, FaUserCircle } from "react-icons/fa";
+import { MdDeleteForever } from "react-icons/md";
+import UpdateUser from './UpdateUser'
+import DeleteUser from'./DeleteUser'
+
 const UsersList = () => {
   const dispatch = useDispatch();
+  const [showModal, setShowModal] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState(null);
   const { users, isLoading, isError, isSuccess } = useSelector(
     (state) => state.users
   );
@@ -73,13 +78,15 @@ const UsersList = () => {
               className="-none text-blue bg-white hover:text-dark-blue hover:underline"
             >
               Development Team
-            </button>/
+            </button>
+            /
             <button
               onClick={() => handleRole("Scrum Master")}
               className="-none text-blue bg-white hover:text-dark-blue hover:underline"
             >
               Scrum Master
-            </button>/
+            </button>
+            /
             <button
               onClick={() => handleRole("Product Owner")}
               className="-none text-blue bg-white hover:text-dark-blue hover:underline"
@@ -93,52 +100,66 @@ const UsersList = () => {
               <tr className="bg-olive-green text-white">
                 <th className="text-left p-2 border border-light-gray">No.</th>
                 <th className="text-left p-2 border border-light-gray">Name</th>
-                <th className="text-left p-2 border border-light-gray">Username</th>
-                <th className="text-left p-2 border border-light-gray">Email</th>
                 <th className="text-left p-2 border border-light-gray">
-                  Date of Registration
+                  Username
+                </th>
+                <th className="text-left p-2 border border-light-gray">
+                  Email
+                </th>
+                <th className="text-left p-2 border border-light-gray">
+                  Signup Date
                 </th>
                 <th className="text-left p-2 border border-light-gray">
                   Last Update
                 </th>
-                <th className="text-left p-2 border border-light-gray">Actions</th>
+                <th className="text-left p-2 border border-light-gray">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody>
               {filteredUsers.map((user, userIndex) => (
-                <tr
-                  key={user._id}
-                  className={userIndex % 2 === 0 ? "bg-light-gray md" : "shadow-ms"}
-                >
+                <tr key={user._id} className="shadow-md my-4 rounded-2xl">
                   <td className=" p-2 ">
-                  {user.profileImage ?
-                    (<img src={user.profileImage} alt="profile picture" className="rounded-full w-12 h-12"/>):
-                    ( <FaUserCircle size={24}/>)
-                  }</td>
+                    {user.profileImage ? (
+                      <img
+                        src={user.profileImage}
+                        alt="profile picture"
+                        className="rounded-full w-12 h-12"
+                      />
+                    ) : (
+                      <FaUserCircle size={24} className="text-dark-blue" />
+                    )}
+                  </td>
                   <td className=" p-2">
                     {user.firstName} {user.lastName}
                   </td>
-                  <td className=" p-2">
-                    {user.username}
-                  </td>
-                  <td className=" p-2">
-                    {user.email}
-                  </td>
+                  <td className=" p-2">{user.username}</td>
+                  <td className=" p-2">{user.email}</td>
                   <td className=" p-2">
                     {user.createdAt && handleDate(user.createdAt)}
                   </td>
                   <td className=" p-2">
                     {user.updatedAt && handleDate(user.updatedAt)}
                   </td>
-                  <td className=" p-2">
-                    <Link to={`/updateUserProfile/${user._id}`}>
-                      <FaEdit />
-                    </Link>
+                  <td className=" p-2 flex flex-row justify-between">
+                    <FaEdit 
+                    className="text-green" 
+                    onClick={()=>{
+                      setSelectedUserId(user._id)
+                      setShowModal(true)}
+                      }/>
+                    <MdDeleteForever className="text-red" />
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+          {
+            showModal && (
+              <UpdateUser userId={selectedUserId} onClose={() => setShowModal(false)}/>
+            )
+          }
         </div>
       );
     }
