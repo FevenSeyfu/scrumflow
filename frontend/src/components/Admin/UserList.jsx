@@ -80,21 +80,21 @@ const UsersList = () => {
           <div className="flex flex-row">
             <button
               onClick={() => handleRole("Development Team")}
-              className="-none text-blue bg-white hover:text-dark-blue hover:underline"
+              className=" text-blue bg-white hover:text-dark-blue hover:underline"
             >
               Development Team
             </button>
             /
             <button
               onClick={() => handleRole("Scrum Master")}
-              className="-none text-blue bg-white hover:text-dark-blue hover:underline"
+              className=" text-blue bg-white hover:text-dark-blue hover:underline"
             >
               Scrum Master
             </button>
             /
             <button
               onClick={() => handleRole("Product Owner")}
-              className="-none text-blue bg-white hover:text-dark-blue hover:underline"
+              className=" text-blue bg-white hover:text-dark-blue hover:underline"
             >
               Product Owner
             </button>

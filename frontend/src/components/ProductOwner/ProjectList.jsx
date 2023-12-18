@@ -5,12 +5,14 @@ import { FaSpinner, FaEdit, FaTrash } from "react-icons/fa";
 import UpdateProject from './UpdateProject';
 import DeleteProject from './DeleteProject';
 import { toast } from "react-toastify";
+import CreateProject from "./CreateProject";
 
 const ProjectList = () => {
   const dispatch = useDispatch();
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState(null);
+  const [showAddProjectModal, setShowAddProjectModal] = useState(false);
   const { projects, isLoading, isError, isSuccess, message } = useSelector(
     (state) => state.project
   );
@@ -34,12 +36,14 @@ const ProjectList = () => {
   };
 
   const renderProjects = () => {
+    if (!projects || projects.length === 0) {
+        return <p>No projects available.</p>;
+      }
     // Sort projects alphabetically by project name
-    projects.sort((a, b) => a.projectName.localeCompare(b.projectName));
-
-    if (isLoading) {
-      return <FaSpinner />;
-    }
+    const sortedProjects = [...projects];
+  
+  // Sort projects alphabetically by project name
+  sortedProjects.sort((a, b) => a.name.localeCompare(b.name));
 
     if (isError && message) {
       return toast.error(message);
@@ -48,6 +52,14 @@ const ProjectList = () => {
     if (isSuccess) {
       return (
         <div className="flex flex-col mx-16 gap-2">
+            <button
+              onClick={() => {
+                setShowAddProjectModal(true);
+              }}
+              className="text-left text-blue bg-white hover:text-dark-blue hover:underline"
+            >
+               + Add Project
+            </button>
           <table className="table-auto ">
             <thead>
               <tr className="bg-olive-green text-white">
@@ -68,7 +80,7 @@ const ProjectList = () => {
               {projects.map((project, projectIndex) => (
                 <tr key={project._id} className="shadow-md my-4 rounded-2xl">
                   <td className="p-2">{projectIndex + 1}</td>
-                  <td className="p-2">{project.projectName}</td>
+                  <td className="p-2">{project.name}</td>
                   <td className="p-2">
                     {project.startDate && handleDate(project.startDate)}
                   </td>
@@ -106,7 +118,7 @@ const ProjectList = () => {
 
   return (
     <div className="flex flex-col justify-center">
-      <h1 className="text-3xl mb-4 text-center mx-8">Projects List</h1>
+      <h1 className="text-3xl mb-4 text-center mx-8">My Projects</h1>
       {showUpdateModal && (
         <UpdateProject
           projectId={selectedProjectId}
@@ -119,6 +131,9 @@ const ProjectList = () => {
           projectId={selectedProjectId}
           onClose={() => setShowDeleteModal(false)}
         />
+      )}
+      {showAddProjectModal && (
+        <CreateProject onClose={() => setShowAddProjectModal(false)} />
       )}
       {renderProjects()}
     </div>
