@@ -19,7 +19,7 @@ const getAllProjects = async (projectownerId,token) => {
             Authorization: `Bearer ${token}`,
         },
     }
-    const response = await axios.get(PROJECT_URL+projectownerId,config)
+    const response = await axios.get(`${PROJECT_URL}${projectownerId}`,config);
     return response.data
 }
 // router.get('/:id',protect, getProjectById);
