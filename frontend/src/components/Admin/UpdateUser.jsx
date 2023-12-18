@@ -1,19 +1,23 @@
-import React from 'react'
-import Modal from "react-modal";
+import React from 'react';
+import Modal from 'react-modal';
 
-const UpdateUser = ({userId,onClose}) => {
+Modal.setAppElement("#root");
+const UpdateUser = ({ userId, onClose }) => {
   return (
-
-      <Modal
+    <Modal
       isOpen={true}
-      contentLabel="Write Comment"
+      contentLabel="Update User"
       className="fixed top-0 left-0 w-full h-full flex justify-center items-center"
       overlayClassName="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center"
+      onRequestClose={onClose}  
+      shouldCloseOnOverlayClick={true}  
     >
-      <p>userID: {userId}</p>
-      <button onClick={onclose}>x</button>
-      </Modal>
-  )
-}
+      <div className="bg-white p-8 rounded">
+        <p>userID: {userId}</p>
+        <button onClick={onClose}>x</button>
+      </div>
+    </Modal>
+  );
+};
 
 export default UpdateUser

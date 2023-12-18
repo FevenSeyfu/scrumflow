@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllUsers, reset } from "../../features/users/userSlice";
-import { FaSpinner, FaEdit, FaUserCircle } from "react-icons/fa";
-import { MdDeleteForever } from "react-icons/md";
+import { FaSpinner, FaEdit, FaUserCircle,FaTrash } from "react-icons/fa";
 import UpdateUser from './UpdateUser'
 import DeleteUser from'./DeleteUser'
 
 const UsersList = () => {
   const dispatch = useDispatch();
-  const [showModal, setShowModal] = useState(false);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
   const { users, isLoading, isError, isSuccess } = useSelector(
     (state) => state.users
@@ -147,17 +147,25 @@ const UsersList = () => {
                     className="text-green" 
                     onClick={()=>{
                       setSelectedUserId(user._id)
-                      setShowModal(true)}
+                      setShowUpdateModal(true)}
                       }/>
-                    <MdDeleteForever className="text-red" />
+                    <FaTrash 
+                    className="text-red" 
+                    onClick={()=>{
+                      setSelectedUserId(user._id)
+                      setShowDeleteModal(true)}
+                      }/>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
           {
-            showModal && (
-              <UpdateUser userId={selectedUserId} onClose={() => setShowModal(false)}/>
+            showUpdateModal && (
+              <UpdateUser userId={selectedUserId} onClose={() => setShowUpdateModal(false)}/>
+            ) ||
+            showDeleteModal && (
+              <DeleteUser userId={selectedUserId} onClose={() => setShowDeleteModal(false)}/>
             )
           }
         </div>
