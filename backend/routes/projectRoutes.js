@@ -5,7 +5,7 @@ import { protect } from '../middlewares/authMiddleware.js';
 const router = express.Router();
 
 
-router.get('/:projectOwnerId',protect, getAllProjects);
+router.get('/myproject/:projectOwnerId',protect, getAllProjects);
 router.get('/:id',protect, getProjectById);
 router.post('/', protect,validateProject,createProject);
 router.put('/:id',protect, updateProject);
