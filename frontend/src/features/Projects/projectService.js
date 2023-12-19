@@ -13,13 +13,13 @@ const createProject = async (projectData,token) => {
     return response.data
 }
 // router.get('/',protect, getAllProjects);
-const getAllProjects = async (projectownerId,token) => {
+const getAllProjects = async (token) => {
     const config = {
         headers: {
             Authorization: `Bearer ${token}`,
         },
     }
-    const response = await axios.get(`${PROJECT_URL}/myproject/${projectownerId}`,config);
+    const response = await axios.get(PROJECT_URL,config);
     return response.data
 }
 // router.get('/:id',protect, getProjectById);

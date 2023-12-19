@@ -4,41 +4,21 @@ import { getAllProjects, reset } from "../../features/Projects/projectSlice";
 import { FaSpinner, FaEdit, FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
 // components
-import CreateProject from "./CreateProject";
-import ProjectDetail from "./ProjectDetail";
-import UpdateProject from "./UpdateProject";
-import DeleteProject from "./DeleteProject";
 
 const ProjectList = () => {
   const dispatch = useDispatch();
-  const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedProjectId, setSelectedProjectId] = useState(null);
-  const [showAddProjectModal, setShowAddProjectModal] = useState(false);
-  const [showProjectDetailModal, setShowProjectDetailModal] = useState(false);
   const { projects, isLoading, isError, isSuccess, message } = useSelector(
     (state) => state.project
   );
   const { user } = useSelector((state) => state.auth);
-  const filteredProjects = projects.filter(project => project.projectOwner !== null && (project.projectOwner._id === user.id));
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        await dispatch(getAllProjects());
-        
-      } catch (error) {
-        console.error("Error fetching projects:", error);
-        toast.error("Error fetching projects");
-      }
-    };
-  
-    fetchData();
-  
-    return () => {
-      dispatch(reset());
-    };
+    dispatch(getAllProjects(user.id));
+    if (isSuccess && projects) {
+      return () => {
+        dispatch(reset());
+      };
+    }
   }, [dispatch]);
-  
 
   const handleDate = (dateInput) => {
     const months = [
@@ -107,7 +87,7 @@ const ProjectList = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredProjects.map((project, projectIndex) => (
+                {projects.map((project, projectIndex) => (
                   <tr key={projectIndex} className="shadow-md my-4 rounded-2xl">
                     <td className="p-2">{projectIndex + 1}</td>
                     <td className="p-2">

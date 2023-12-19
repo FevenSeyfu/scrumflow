@@ -142,7 +142,7 @@ const UpdateProject = ({ project_id, onClose }) => {
       await dispatch(updateProject({projectData, project_id}));
 
       if (isSuccess) {  
-        await dispatch(getAllProjects(user.id));
+        await dispatch(getAllProjects());
         setUpdatedData({
           name: "",
           startDate: "",

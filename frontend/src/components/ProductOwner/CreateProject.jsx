@@ -107,7 +107,7 @@ const CreateProject = ({ onClose }) => {
     if (isSuccess) {
       onClose();
       toast.success("Project created successfully");
-      dispatch(getAllProjects(user.id))
+      dispatch(getAllProjects())
     }
   };
 

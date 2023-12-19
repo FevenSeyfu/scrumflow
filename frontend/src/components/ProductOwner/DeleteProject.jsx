@@ -24,7 +24,7 @@ const DeleteProject = ({ project_id, onClose }) => {
     if(isSuccess){
       onClose()
       toast.info('Project Deleted!')
-      dispatch(getAllProjects(user.id));
+      dispatch(getAllProjects());
     }
   };
 
