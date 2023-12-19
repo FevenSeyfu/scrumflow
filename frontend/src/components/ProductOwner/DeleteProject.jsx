@@ -19,8 +19,8 @@ const DeleteProject = ({ project_id, onClose }) => {
   });
 
   const { user } = useSelector((state) => state.auth);
-  const handleDelete = () => {
-    dispatch(deleteProject(project_id));
+  const handleDelete = async() => {
+    await dispatch(deleteProject(project_id));
     if(isSuccess){
       onClose()
       toast.info('Project Deleted!')
@@ -28,6 +28,7 @@ const DeleteProject = ({ project_id, onClose }) => {
     }
   };
 
+  
   const handleClose = () => {
     onClose();
   };

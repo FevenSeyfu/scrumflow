@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   updateProject,
   getProjectById,
+  getAllProjects,
   reset,
 } from "../../features/Projects/projectSlice";
 import { getAllUsers } from "../../features/users/userSlice";
@@ -16,32 +17,33 @@ Modal.setAppElement("#root");
 
 const UpdateProject = ({ project_id, onClose }) => {
   const dispatch = useDispatch();
-  const { project,projects, isLoading, isError, isSuccess, message } = useSelector(
+  const { project, isLoading, isError, isSuccess, message } = useSelector(
     (state) => state.project
   );
+  const projects = useSelector((state) => state.project.projects); // Adjust as needed
+  const { users } = useSelector((state) => state.users);
+  const { user } = useSelector((state) => state.auth);
 
-  const { users} = useSelector(
-    (state) => state.users
-  );
   const [updatedData, setUpdatedData] = useState({
     name: "",
     startDate: "",
-    scrumMaster: null,
+    scrumMaster: "",
     description: "",
     teamMembers: [],
     tasks: [],
     status: "open",
+    projectOwner: "",
   });
-  const [scrumMasterOptions, setScrumMasterOptions] = useState([]);
-  const [devTeamOptions, setDevTeamOptions] = useState([]);
 
   const [selectedScrumMaster, setSelectedScrumMaster] = useState(null);
   const [selectedTeamMembers, setSelectedTeamMembers] = useState([]);
+  const [scrumMasterOptions, setScrumMasterOptions] = useState([]);
+  const [devTeamOptions, setDevTeamOptions] = useState([]);
   useEffect(() => {
-    // dispatch getallusers
+    // Dispatch getAllUsers
     dispatch(getAllUsers());
   }, [dispatch]);
-  
+
   useEffect(() => {
     const fetchProjectData = async () => {
       try {
@@ -50,24 +52,30 @@ const UpdateProject = ({ project_id, onClose }) => {
           const selectedProject = projects.find(
             (project) => project._id === project_id
           );
-          selectedProject &&
+
+          if (selectedProject) {
             setUpdatedData({
-              name: selectedProject.name,
-              startDate: handleDate(selectedProject.startDate),
-              scrumMaster: selectedProject.scrumMaster
-                ? selectedProject.scrumMaster.project_id
-                : null,
-              description: selectedProject.description,
-              teamMembers: selectedProject.teamMembers.map(
-                (member) => member._id
-              ),
+              name: selectedProject.name || "",
+              startDate: selectedProject.startDate
+                ? new Date(selectedProject.startDate)
+                    .toISOString()
+                    .split("T")[0]
+                : "",
+              description: selectedProject.description || "",
+              projectOwner: user.id || "",
+              scrumMaster: selectedProject.scrumMaster?._id || "",
+              teamMembers:
+                selectedProject.teamMembers?.map((member) => member._id) || [],
+              tasks: [],
+              status: "open",
             });
-          setSelectedScrumMaster(selectedProject.scrumMaster);
-          setSelectedTeamMembers(
-            selectedProject.teamMembers.map((member) => member._id)
-          );
+            setSelectedScrumMaster(selectedProject.scrumMaster);
+            setSelectedTeamMembers(
+              selectedProject.teamMembers?.map((member) => member._id) || []
+            );
+          }
         }
-       
+
         // Set options for Scrum Master
         const scrumOptions = users
           .filter((user) => user.role === "Scrum Master")
@@ -75,7 +83,6 @@ const UpdateProject = ({ project_id, onClose }) => {
             value: user._id,
             label: user.username,
           }));
-        setScrumMasterOptions(scrumOptions);
 
         // Set options for Development Team
         const devOptions = users
@@ -84,64 +91,74 @@ const UpdateProject = ({ project_id, onClose }) => {
             value: user._id,
             label: user.username,
           }));
+
+        setScrumMasterOptions(scrumOptions);
         setDevTeamOptions(devOptions);
       } catch (error) {
-        toast.error(error.message);
+        console.error(error);
+        toast.error(`Error: ${error.message}`);
       }
     };
+
     fetchProjectData();
-    
-  }, [dispatch, project_id]);
-
-
-  const handleDate = (dateInput) => {
-    const date = new Date(dateInput);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  };
+  }, [dispatch, project_id, projects, user.id, users]);
 
   const handleScrumMasterChange = (selectedOption) => {
     setUpdatedData((prevState) => ({
       ...prevState,
-      scrumMaster: selectedOption,
+      scrumMaster: selectedOption.value,
     }));
     setSelectedScrumMaster(selectedOption);
   };
 
-  const handleTeamMemeberChange = (selectedOptions) => {
+  const handleTeamMemberChange = (selectedOptions) => {
     setUpdatedData((prevState) => ({
       ...prevState,
-      teamMembers: selectedOptions,
+      teamMembers: selectedOptions.map((option) => option.value),
     }));
     setSelectedTeamMembers(selectedOptions);
   };
-  const onChange = async (e) => {
+
+  const onChange = (e) => {
     setUpdatedData((prevState) => ({
       ...prevState,
       [e.target.name]: e.target.value,
     }));
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
-    const scrumMasterId =
-    updatedData.scrumMaster && updatedData.scrumMaster.value;
-  // fetch selected development team member's Id
-  const devTeamIDs =
-  updatedData.teamMembers ?.map((member) => member.value) || [];
-    // Add projectId to projectData
-    const projectData = {
-      ...updatedData,
+
+    try {
+      const scrumMasterId = selectedScrumMaster?.value || "";
+      const devTeamIDs =
+        selectedTeamMembers.map((member) => member.value) || [];
+
+      const projectData = {
+        ...updatedData,
         scrumMaster: scrumMasterId,
         teamMembers: devTeamIDs,
-    };
-    dispatch(updateProject(projectData,project_id));
-    if (isSuccess) {
-      setUpdatedData({});
-      onClose();
-      toast.success("Project updated successfully");
+      };
+      await dispatch(updateProject({projectData, project_id}));
+
+      if (isSuccess) {
+        setUpdatedData({
+          name: "",
+          startDate: "",
+          scrumMaster: "",
+          description: "",
+          teamMembers: [],
+          tasks: [],
+          status: "open",
+          projectOwner: "",
+        });
+
+        onClose();
+        toast.success("Project updated successfully");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error(`Error: ${error.message}`);
     }
   };
 
@@ -162,7 +179,7 @@ const UpdateProject = ({ project_id, onClose }) => {
         {isLoading && <FaSpinner />}
         <form
           onSubmit={handleFormSubmit}
-          className="p-8 shadow-lg rounded-md flex flex-col "
+          className="p-8 shadow-lg rounded-md flex flex-col"
         >
           <div className="flex flex-col md:flex-row  md:gap-4 md:items-center">
             <label htmlFor="name">Name:</label>
@@ -205,10 +222,11 @@ const UpdateProject = ({ project_id, onClose }) => {
             <Select
               id="scrumMaster"
               name="scrumMaster"
-              value={updatedData.scrumMaster}
+              value={scrumMasterOptions.find(
+                (option) => option.value === updatedData.scrumMaster
+              )}
               onChange={handleScrumMasterChange}
               options={scrumMasterOptions}
-              
             />
             <label htmlFor="teamMembers" className="pt-4">
               Development Team:
@@ -216,8 +234,10 @@ const UpdateProject = ({ project_id, onClose }) => {
             <Select
               id="teamMembers"
               name="teamMembers"
-              value={updatedData.teamMembers}
-              onChange={handleTeamMemeberChange}
+              value={updatedData.teamMembers.map((member) =>
+                devTeamOptions.find((option) => option.value === member)
+              )}
+              onChange={handleTeamMemberChange}
               options={devTeamOptions}
               isMulti
             />

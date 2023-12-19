@@ -12,7 +12,7 @@ const initialState = {
 
 const handleError = (error, thunkAPI) => {
   const message =
-    (error.response && error.response.data && error.response.message) ||
+    (error.response && error.response.data && error.response.data.message) ||
     error.message ||
     error.toString();
 
@@ -59,10 +59,13 @@ export const createProject = createAsyncThunk(
 
 export const updateProject = createAsyncThunk(
   "project/updateProject",
-  async (projectData, project_id , thunkAPI) => {
+  async ({ projectData, project_id }, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      return await projectService.updateProject(projectData, project_id, token);
+      const projectownerId = thunkAPI.getState().auth.user.id;
+      await projectService.updateProject(projectData, project_id, token);
+      const updatedProject = await projectService.getAllProjects(projectownerId,token)
+      return updatedProject;
     } catch (error) {
       return handleError(error, thunkAPI);
     }
