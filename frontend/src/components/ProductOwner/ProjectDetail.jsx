@@ -1,8 +1,8 @@
 import React from 'react'
 
-const ProjectDetail = () => {
+const ProjectDetail = ({projectId}) => {
   return (
-    <div>ProjectDetail</div>
+    <div>ProjectDetail : {projectId}</div>
   )
 }
 

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import Layout from "../common/Layout";
 import AddTask from "./AddTask";
-import ProjectDetail from "./ProjectDetail";
 import AssignTeam from "./AssignTeam";
 import ProjectList from "./ProjectList";
 
@@ -11,7 +10,6 @@ const ProductOwnerDashboard = () => {
     <Layout>
       <ProjectList />
       <AddTask />
-      <ProjectDetail />
       <AssignTeam />
     </Layout>
   );
