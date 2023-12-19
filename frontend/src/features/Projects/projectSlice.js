@@ -19,17 +19,7 @@ const handleError = (error, thunkAPI) => {
   return thunkAPI.rejectWithValue(message);
 };
 
-export const createProject = createAsyncThunk(
-  "project/createProject",
-  async (projectData, thunkAPI) => {
-    try {
-      const token = thunkAPI.getState().auth.user.token;
-      return await projectService.createProject(projectData, token);
-    } catch (error) {
-      return handleError(error, thunkAPI);
-    }
-  }
-);
+
 
 export const getAllProjects = createAsyncThunk(
   "project/getAllProjects",
@@ -55,9 +45,21 @@ export const getProjectById = createAsyncThunk(
   }
 );
 
+export const createProject = createAsyncThunk(
+  "project/createProject",
+  async (projectData, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.user.token;
+      return await projectService.createProject(projectData, token);
+    } catch (error) {
+      return handleError(error, thunkAPI);
+    }
+  }
+);
+
 export const updateProject = createAsyncThunk(
   "project/updateProject",
-  async ({ projectData, project_id }, thunkAPI) => {
+  async (projectData, project_id , thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
       return await projectService.updateProject(projectData, project_id, token);

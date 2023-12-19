@@ -25,7 +25,7 @@ const Header = () => {
             <>
               <button onClick={() => setMenuOpen(!isMenuOpen)}>
                 {user.profileImage ? (
-                  <img src={user.profileImage} alt="profile image" className="w-12 h-12 rounded-full"/>
+                  <img src={user.profileImage} alt="profile image" className="w-8 h-8 rounded-full"/>
                 ) : (
                   <RxAvatar size={30} />
                 )}

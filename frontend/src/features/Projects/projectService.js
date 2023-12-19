@@ -39,7 +39,7 @@ const updateProject = async (projectData,project_id,token) => {
             Authorization: `Bearer ${token}`,
         },
     }
-    const response = await axios.put(PROJECT_URL+project_id,projectData,config)
+    const response = await axios.put(`${PROJECT_URL}${project_id}`,projectData,config)
     return response.data
 }
 // router.put('/:id/assign', protect, assignProject);

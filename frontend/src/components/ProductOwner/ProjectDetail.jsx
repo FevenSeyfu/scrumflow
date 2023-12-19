@@ -4,6 +4,7 @@ import { getProjectById, reset } from "../../features/Projects/projectSlice";
 import { FaSpinner, FaUser } from "react-icons/fa";
 import Modal from "react-modal";
 import { MdClose } from "react-icons/md";
+Modal.setAppElement("#root");
 
 const ProjectDetail = ({ project_id, onClose }) => {
   const dispatch = useDispatch();
@@ -71,7 +72,7 @@ const ProjectDetail = ({ project_id, onClose }) => {
             <hr className="my-4 text-olive-green" />
             <div>
               <div className="flex-col justify-start">
-              <h3 className="font-bold text-xl  my-4">Scrum Master</h3>
+                <h3 className="font-bold text-xl  my-4">Scrum Master</h3>
                 <div className="flex flex-col gap-2 justify-start lg:flex-row  lg:items-center">
                   <div className="flex flex-items items-center gap-4">
                     {projectDetail.scrumMaster.profileImage ? (
@@ -88,7 +89,6 @@ const ProjectDetail = ({ project_id, onClose }) => {
                       {projectDetail.scrumMaster.lastName}
                     </p>
                   </div>
-                  <p>{projectDetail.scrumMaster.email}</p>
                 </div>
               </div>
             </div>
@@ -99,15 +99,19 @@ const ProjectDetail = ({ project_id, onClose }) => {
                 {projectDetail.teamMembers ? (
                   <div>
                     {projectDetail.teamMembers.map((teammember) => (
-                      <table>
+                      <table >
                         <tbody>
-                          <tr key={teammember.id}>
+                          <tr key={teammember._id}>
                             <td className=" flex flex-row items-center gap-2 ">
-                              <img
-                                src={teammember.profileImage}
-                                alt="Profile Image"
-                                className="h-8 w-8 rounded-full"
-                              />
+                              {teammember.profileImage? (
+                                <img
+                                  src={teammember.profileImage}
+                                  alt="Profile Image"
+                                  className="h-8 w-8 rounded-full"
+                                />
+                              ) : (
+                                <FaUser />
+                              )}
                               <p>
                                 {teammember.firstName} {teammember.lastName}
                               </p>

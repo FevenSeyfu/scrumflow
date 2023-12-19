@@ -1,18 +1,27 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createProject, reset } from "../../features/Projects/projectSlice";
+import {
+  createProject,
+  getAllProjects,
+  reset,
+} from "../../features/Projects/projectSlice";
 import { getAllUsers } from "../../features/users/userSlice";
 import Select from "react-select";
 import { toast } from "react-toastify";
 import Modal from "react-modal";
 import { FaSpinner } from "react-icons/fa";
 import { MdClose } from "react-icons/md";
+Modal.setAppElement("#root");
 
 const CreateProject = ({ onClose }) => {
   const dispatch = useDispatch();
-  const { users, isLoading, isError, isSuccess } = useSelector(
+  const { users} = useSelector(
     (state) => state.users
   );
+  const { projects,isLoading, isError, isSuccess, message } = useSelector(
+    (state) => state.project
+  );
+  const { user } = useSelector((state) => state.auth);
   const [projectData, setProjectData] = useState({
     name: "",
     description: "",
@@ -98,6 +107,7 @@ const CreateProject = ({ onClose }) => {
     if (isSuccess) {
       onClose();
       toast.success("Project created successfully");
+      dispatch(getAllProjects(user.id))
     }
   };
 
@@ -114,46 +124,50 @@ const CreateProject = ({ onClose }) => {
         <div className="flex justify-end">
           <MdClose size={30} onClick={onClose} />
         </div>
-        <h2 className="font-bold text-2xl text-center mb-12">
+        <h2 className="font-bold text-2xl text-center">
           Create New Project
         </h2>
         {isLoading && <FaSpinner />}
-        <form onSubmit={handleFormSubmit} className=" p-8 shadow-lg rounded-md">
-          <label htmlFor="name">
-            Name:
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={projectData.name}
-              onChange={handleInputChange}
-              className="border rounded-md mr-4 ml-1 py-1 focus:outline-blue"
-            />
-          </label>
-          <label htmlFor="description">
+        <form
+          onSubmit={handleFormSubmit}
+          className="p-8 shadow-lg rounded-md flex flex-col "
+        >
+          <div className="flex flex-col md:flex-row  md:gap-4 md:items-center">
+          <label htmlFor="name">Name:</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            value={projectData.name}
+            onChange={handleInputChange}
+            className="border border-gray rounded-md  py-1 focus:outline-blue"
+            required
+          />
+          <label htmlFor="description">Start Date: </label>
+          <input
+            type="date"
+            id="startDate"
+            name="startDate"
+            value={projectData.startDate}
+            onChange={handleInputChange}
+            className="border border-gray rounded-md  py-1 focus:outline-blue"
+            required
+          />
+          </div>
+          <label htmlFor="description" className="flex flex-col  mt-2">
             Description:
-            <input
-              type="textarea"
+            <textarea
+              rows={5}
               id="description"
               name="description"
               value={projectData.description}
               onChange={handleInputChange}
-              className="border rounded-md mr-4 ml-1 py-1 focus:outline-blue"
+              className="border border-gray rounded-md  py-1 focus:outline-blue"
+              required
             />
           </label>
-          <label htmlFor="description">
-            StartDate:
-            <input
-              type="date"
-              id="startDate"
-              name="startDate"
-              value={projectData.startDate}
-              onChange={handleInputChange}
-              className="border rounded-md mr-4 ml-1 py-1 focus:outline-blue"
-            />
-          </label>
-          <div className="mt-4">
-            <label htmlFor="scrumMaster" className="pt-12">
+          <div className="flex flex-col">
+            <label htmlFor="scrumMaster" className="pt-4">
               Scrum Master:
             </label>
             <Select
@@ -162,8 +176,9 @@ const CreateProject = ({ onClose }) => {
               value={projectData.scrumMaster}
               onChange={handleScrumMasterChange}
               options={scrumMasterOptions}
+              required
             />
-            <label htmlFor="teamMembers" className="pt-12">
+            <label htmlFor="teamMembers" className="pt-4">
               Development Team:
             </label>
             <Select
@@ -175,7 +190,7 @@ const CreateProject = ({ onClose }) => {
               isMulti
             />
           </div>
-          <div className="flex justify-center my-8">
+          <div className="flex justify-center my-2">
             <button
               type="submit"
               className="p-2 border rounded-md border-olive-green text-olive-green font-bold hover:bg-olive-green hover:text-white"
