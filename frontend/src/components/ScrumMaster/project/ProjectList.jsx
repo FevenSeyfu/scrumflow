@@ -1,24 +1,43 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllProjects, reset } from "../../features/Projects/projectSlice";
-import { FaSpinner, FaEdit, FaTrash } from "react-icons/fa";
+import { getAllProjects, reset } from "../../../features/Projects/projectSlice";
+import { FaSpinner, FaEdit } from "react-icons/fa";
 import { toast } from "react-toastify";
+import Spinner from "../../common/Spinner";
 // components
+
+import ProjectDetail from "./ProjectDetail";
+import UpdateProject from "../../ProductOwner/UpdateProject/"
+import { Link } from "react-router-dom";
+
 
 const ProjectList = () => {
   const dispatch = useDispatch();
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [selectedProjectId, setSelectedProjectId] = useState(null);
+  const [showProjectDetailModal, setShowProjectDetailModal] = useState(false);
   const { projects, isLoading, isError, isSuccess, message } = useSelector(
     (state) => state.project
   );
   const { user } = useSelector((state) => state.auth);
+  const filteredProjects = projects.filter(project => project.scrumMaster !== null && (project.scrumMaster._id === user.id));
   useEffect(() => {
-    dispatch(getAllProjects(user.id));
-    if (isSuccess && projects) {
-      return () => {
-        dispatch(reset());
-      };
-    }
+    const fetchData = async () => {
+      try {
+        await dispatch(getAllProjects());
+        
+      } catch (error) {
+        toast.error("Error fetching projects");
+      }
+    };
+  
+    fetchData();
+  
+    return () => {
+      dispatch(reset());
+    };
   }, [dispatch]);
+  
 
   const handleDate = (dateInput) => {
     const months = [
@@ -45,7 +64,7 @@ const ProjectList = () => {
   };
   const renderProjects = () => {
     if (isLoading) {
-      return <FaSpinner />;
+      return <Spinner size={30} />;
     }
     if (isError && message) {
       return toast.error(message);
@@ -54,14 +73,6 @@ const ProjectList = () => {
     if (isSuccess) {
       return (
         <div className="flex flex-col mx-16 gap-2">
-          <button
-            onClick={() => {
-              setShowAddProjectModal(true);
-            }}
-            className="text-left text-blue bg-white hover:text-dark-blue hover:underline"
-          >
-            + Add Project
-          </button>
           {!projects || projects.length === 0 ? (
             <p>No projects available.</p>
           ) : (
@@ -79,7 +90,7 @@ const ProjectList = () => {
                     Start Date
                   </th>
                   <th className="text-left p-2 border border-light-gray ">
-                    Scrum Master
+                    Product Owner
                   </th>
                   <th className="text-left p-2 border border-light-gray">
                     Actions
@@ -87,19 +98,17 @@ const ProjectList = () => {
                 </tr>
               </thead>
               <tbody>
-                {projects.map((project, projectIndex) => (
+                {filteredProjects.map((project, projectIndex) => (
                   <tr key={projectIndex} className="shadow-md my-4 rounded-2xl">
                     <td className="p-2">{projectIndex + 1}</td>
                     <td className="p-2">
-                      <button
-                        className="hover:text-blue hover:text-lg"
-                        onClick={() => {
-                          setSelectedProjectId(project._id);
-                          setShowProjectDetailModal(true);
-                        }}
-                      >
-                        {project.name}
-                      </button>
+                      
+                        <Link 
+                          className="hover:text-blue hover:text-lg"
+                          to={`/dashboard/project/${project._id}`}> 
+                          {project.name}
+                        </Link>
+                      
                     </td>
                     <td className="p-2 hidden lg:flex md:flex">
                       {project.startDate && handleDate(project.startDate)}
@@ -107,10 +116,10 @@ const ProjectList = () => {
                     <td className="p-2 ">
                       <div className="flex flex-col justify-evenly items-center md:flex-row">
                         <div className="">
-                          {project.scrumMaster && (project.scrumMaster.username)} 
+                          {project.projectOwner && (project.projectOwner.username)} 
                         </div>
-                       {project.scrumMaster &&( <img
-                          src={project.scrumMaster.profileImage}
+                       {project.projectOwner &&( <img
+                          src={project.projectOwner.profileImage}
                           alt="Profile Image"
                           className="h-8 w-8 rounded-full"
                         />)}
@@ -123,14 +132,6 @@ const ProjectList = () => {
                           setSelectedProjectId(project._id);
                           setShowUpdateModal(true);
                           setShowDeleteModal(false);
-                        }}
-                      />
-                      <FaTrash
-                        className="text-red"
-                        onClick={() => {
-                          setSelectedProjectId(project._id);
-                          setShowDeleteModal(true);
-                          setShowUpdateModal(false);
                         }}
                       />
                     </td>
@@ -147,28 +148,12 @@ const ProjectList = () => {
   };
 
   return (
-    <div className="flex flex-col justify-center">
+    <div className="flex flex-col justify-center items-center mt-4">
       <h1 className="text-3xl mb-4 text-center mx-8">My Projects</h1>
       {showUpdateModal && (
         <UpdateProject
         project_id={selectedProjectId}
           onClose={() => setShowUpdateModal(false)}
-        />
-      )}
-
-      {showDeleteModal && (
-        <DeleteProject
-          project_id={selectedProjectId}
-          onClose={() => setShowDeleteModal(false)}
-        />
-      )}
-      {showAddProjectModal && (
-        <CreateProject onClose={() => setShowAddProjectModal(false)} />
-      )}
-      {showProjectDetailModal && (
-        <ProjectDetail
-          project_id={selectedProjectId}
-          onClose={() => setShowProjectDetailModal(false)}
         />
       )}
       {renderProjects()}
