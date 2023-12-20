@@ -135,10 +135,9 @@ export const updateProject = async (req, res) => {
     if (name) updateFields.name = name;
     if (description) updateFields.description = description;
     if (startDate) updateFields.startDate = startDate;
-    updateFields.scrumMaster = scrumMaster || existingProject.scrumMaster;
-    updateFields.teamMembers = teamMembers || existingProject.teamMembers;
-    updateFields.tasks = tasks || existingProject.tasks;
-
+    updateFields.scrumMaster = scrumMaster !== undefined ? scrumMaster : existingProject.scrumMaster;
+    updateFields.teamMembers = teamMembers !== undefined ? teamMembers : existingProject.teamMembers;
+    updateFields.tasks = tasks !== undefined ? tasks : existingProject.tasks;
 
     // Handle assigning projects
     const assignmentResult = await assignForProject(
