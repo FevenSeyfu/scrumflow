@@ -328,6 +328,7 @@ const Register = () => {
             <button
               type="submit"
               className="text-white  bg-olive-green py-2 px-4 rounded-lg"
+              disabled={isLoading}
             >
               Signup
             </button>

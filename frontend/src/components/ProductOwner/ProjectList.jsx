@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAllProjects, reset } from "../../features/Projects/projectSlice";
 import { FaSpinner, FaEdit, FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
+import Spinner from "../common/Spinner";
 // components
 import CreateProject from "./CreateProject";
 import ProjectDetail from "./ProjectDetail";
@@ -65,7 +66,7 @@ const ProjectList = () => {
   };
   const renderProjects = () => {
     if (isLoading) {
-      return <FaSpinner />;
+      return <Spinner size={30} />;
     }
     if (isError && message) {
       return toast.error(message);
@@ -167,7 +168,7 @@ const ProjectList = () => {
   };
 
   return (
-    <div className="flex flex-col justify-center">
+    <div className="flex flex-col justify-center items-center mt-4">
       <h1 className="text-3xl mb-4 text-center mx-8">My Projects</h1>
       {showUpdateModal && (
         <UpdateProject

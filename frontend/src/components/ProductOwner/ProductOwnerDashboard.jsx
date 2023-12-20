@@ -9,8 +9,8 @@ const ProductOwnerDashboard = () => {
   return (
     <Layout>
       <ProjectList />
-      <AddTask />
-      <AssignTeam />
+      {/* <AddTask />
+      <AssignTeam /> */}
     </Layout>
   );
 };
