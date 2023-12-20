@@ -59,9 +59,9 @@ const ProjectDetail = () => {
   return (
     <Layout>
       <div className="bg-white text-black  rounded-xl p-4 w-full">
-        <div className="flex justify-start">
+        <div className="flex justify-start items-center mb-8">
           <FaArrowLeft onClick={onClose} />
-          <h2 className="font-bold text-2xl text-center mb-8 whitespace-normal">
+          <h2 className="font-bold text-2xl text-center  whitespace-normal">
             {projectDetail.name}
           </h2>
         </div>
