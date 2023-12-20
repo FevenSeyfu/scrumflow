@@ -1,4 +1,4 @@
-import React, { useEffect,useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllTasks, reset } from "../../features/Tasks/taskSlice";
 import { getAllUsers } from "../../features/users/userSlice";
@@ -15,7 +15,7 @@ const TasksList = ({ ProjectTasks }) => {
   }, [dispatch]);
   const getUser = (assignee) => {
     const user = users.find((user) => user._id === assignee);
-    return user && ( user.profileImage)
+    return user && user.profileImage;
   };
   useEffect(() => {
     dispatch(getAllTasks());
@@ -24,6 +24,29 @@ const TasksList = ({ ProjectTasks }) => {
     };
   }, [dispatch]);
 
+  const handleDate = (dateInput) => {
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+
+    const date = new Date(dateInput);
+    const monthName = months[date.getMonth()];
+    const day = date.getDate();
+    const year = date.getFullYear();
+
+    return `${monthName} ${day}, ${year}`;
+  };
   const columns = {
     "To Do": [],
     "In Progress": [],
@@ -47,26 +70,34 @@ const TasksList = ({ ProjectTasks }) => {
           ) : (
             tasks.map((task) => (
               <div
-                className="border border-olive-green rounded-lg w-full p-2 flex flex-row justify-between items-start"
+                className="border border-olive-green rounded-lg w-full p-2 flex flex-col justify-between items-start"
                 key={task._id}
               >
-                <button
-                  className="hover:text-blue"
-                  onClick={() => {
-                    setSelectedTaskId(task._id);
-                    setShowTaskModal(true);
-                  }}
-                >
-                  <h2 className="font-bold ">{task.name}</h2>
-                </button>
+                <div className="flex flex-row justify-between">
                 <img
-                  src={task.assignee && ( getUser(task.assignee))}
-                  alt={`${task.name} image`}
-                  className="h-6 w-6 rounded-full"
-                />
+                    src={task.assignee && getUser(task.assignee)}
+                    alt={`${task.name} image`}
+                    className="h-6 w-6 rounded-full"
+                  />
+                  <button
+                    className="hover:text-blue"
+                    onClick={() => {
+                      setSelectedTaskId(task._id);
+                      setShowTaskModal(true);
+                    }}
+                  >
+                    <h2 className="font-bold text-left ">{task.name.toUpperCase()}</h2>
+                  </button>
+                  
+                </div>
+                <div className="justify-end">
+                  <p className="text-gray text-right text-sm">
+                    {task.deadline && handleDate(task.deadline)}
+                  </p>
+                </div>
                 {showTaskModal && (
                   <TaskDetail
-                  taskId={selectedTaskId}
+                    taskId={selectedTaskId}
                     onClose={() => setShowTaskModal(false)}
                   />
                 )}
