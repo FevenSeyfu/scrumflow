@@ -6,7 +6,6 @@ import { toast } from "react-toastify";
 import Spinner from "../../common/Spinner";
 // components
 
-import ProjectDetail from "./ProjectDetail";
 import UpdateProject from "../../ProductOwner/UpdateProject/"
 import { Link } from "react-router-dom";
 
@@ -15,7 +14,6 @@ const ProjectList = () => {
   const dispatch = useDispatch();
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState(null);
-  const [showProjectDetailModal, setShowProjectDetailModal] = useState(false);
   const { projects, isLoading, isError, isSuccess, message } = useSelector(
     (state) => state.project
   );
@@ -102,13 +100,11 @@ const ProjectList = () => {
                   <tr key={projectIndex} className="shadow-md my-4 rounded-2xl">
                     <td className="p-2">{projectIndex + 1}</td>
                     <td className="p-2">
-                      
                         <Link 
                           className="hover:text-blue hover:text-lg"
                           to={`/dashboard/project/${project._id}`}> 
                           {project.name}
                         </Link>
-                      
                     </td>
                     <td className="p-2 hidden lg:flex md:flex">
                       {project.startDate && handleDate(project.startDate)}
