@@ -13,12 +13,12 @@ export const createProject = async (req, res) => {
       teamMembers,
       tasks,
     } = req.body;
-
+    req.user.role === 'Product Owner' && (projectOwner = req.user._id)
     const newProject = new Project({
       name,
       description,
       startDate,
-      projectOwner: req.user._id,
+      projectOwner,
       scrumMaster,
       teamMembers,
       tasks,
@@ -118,42 +118,45 @@ export const updateProject = async (req, res) => {
       name,
       description,
       startDate,
-      projectOwner,
       scrumMaster,
       teamMembers,
       tasks,
     } = req.body;
 
+    // Fetch the existing project
     const existingProject = await Project.findById(projectId);
 
     if (!existingProject) {
       return res.status(404).json({ message: "Project not found." });
     }
 
-    existingProject.name = name;
-    existingProject.description = description;
-    existingProject.startDate = startDate;
-    existingProject.projectOwner = projectOwner;
-    existingProject.scrumMaster = scrumMaster;
-    existingProject.teamMembers = teamMembers;
-    existingProject.tasks = tasks;
+    // Update specific fields using Mongoose's update method
+    const updateFields = {};
+    if (name) updateFields.name = name;
+    if (description) updateFields.description = description;
+    if (startDate) updateFields.startDate = startDate;
+    updateFields.scrumMaster = scrumMaster || existingProject.scrumMaster;
+    updateFields.teamMembers = teamMembers || existingProject.teamMembers;
+    updateFields.tasks = tasks || existingProject.tasks;
 
-    // Handle assinging projects
+
+    // Handle assigning projects
     const assignmentResult = await assignForProject(
       projectId,
-      scrumMaster,
-      teamMembers
+      updateFields.scrumMaster,
+      updateFields.teamMembers
     );
 
     if (!assignmentResult.success) {
       return res.status(403).json({ message: assignmentResult.message });
     }
-   
+
     // Check project completion after update
     const completionStatus = await checkProjectCompletion(projectId);
     existingProject.status = completionStatus.completed ? 'completed' : 'open';
-     // save the updated project to database
-     await existingProject.save();
+
+    // Use Mongoose's update method to update specific fields
+    await Project.updateOne({ _id: projectId }, { $set: updateFields });
 
     res.status(200).json({
       message: "Project updated successfully.",
