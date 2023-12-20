@@ -11,8 +11,8 @@ const Home = () => {
       <Header />
       <div className="flex-1 flex flex-row ">
         <div className="w-3/6 flex flex-col items-center justify-center px-8">
-          <h2 className="text-4xl font-bold mb-2">Welcome to Scrum Flow</h2>
-          <h3 className="text-2xl font-bold mb-2 text-olive-green">
+          <h2 className="text-4xl font-bold mb-2 text-center">Welcome to Scrum Flow</h2>
+          <h3 className="text-2xl font-bold mb-2 text-olive-green text-center">
             Your Agile Project Companion
           </h3>
           <p className="mx-4 my-8 text-center">

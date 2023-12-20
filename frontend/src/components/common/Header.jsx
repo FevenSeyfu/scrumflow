@@ -17,7 +17,7 @@ const Header = () => {
   return (
     <div className="bg-dark-blue text-light-gray flex flex-row items-center justify-between p-4">
       <Link to="/" id="logo">
-        <h1 className="font-thin text-2xl text-">SCRUM FLOW</h1>
+        <h1 className="font-bold text-2xl text-">SCRUM FLOW</h1>
       </Link>
       <nav>
         <ul className="flex flex-row gap-4">
