@@ -29,7 +29,6 @@ const ProjectDetail = () => {
   );
   const projectDetail = projects.find((project) => project._id === project_id);
   const ProjectTasks = projectDetail.tasks;
-  console.log(projectDetail);
   useEffect(() => {
     dispatch(getProjectById(project_id));
   }, [dispatch]);
