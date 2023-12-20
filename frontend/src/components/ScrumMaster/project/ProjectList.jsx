@@ -71,8 +71,8 @@ const ProjectList = () => {
     if (isSuccess) {
       return (
         <div className="flex flex-col mx-16 gap-2">
-          {!projects || projects.length === 0 ? (
-            <p>No projects available.</p>
+          {!filteredProjects || filteredProjects.length === 0 ? (
+            <p>Not assigned to a project Yet!.</p>
           ) : (
             <table className="table-auto ">
               <thead>
