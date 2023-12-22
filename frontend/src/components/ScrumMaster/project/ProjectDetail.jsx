@@ -5,15 +5,17 @@ import {
   getProjectById,
   reset,
 } from "../../../features/Projects/projectSlice";
-import { FaSpinner, FaUser, FaArrowLeft } from "react-icons/fa";
+import { FaSpinner, FaUser, FaArrowLeft, FaChevronDown } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import TasksList from "../../Tasks/TasksList";
 import Layout from "../../common/Layout";
+
 const ProjectDetail = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const taskId = "6582d920e6e43567f49fac7d";
+  const [expanded, setExpanded] = useState(false);
   const { id: project_id } = useParams();
+
   const onClose = () => {
     navigate("/dashboard/");
   };
@@ -56,11 +58,26 @@ const ProjectDetail = () => {
     return `${monthName} ${day}, ${year}`;
   };
 
+  const truncatedDescription = (description) => {
+    const words = description.split(" ");
+    const maxWords = 10;
+
+    if (words.length > maxWords) {
+      return words.slice(0, maxWords).join(" ") + " ...";
+    } else {
+      return description;
+    }
+  };
+
+  const toggleExpansion = () => {
+    setExpanded(!expanded);
+  };
+  
   return (
     <Layout>
       <div className="bg-white text-black  rounded-xl p-4 w-full">
         <div className="flex justify-start items-center mb-8">
-          <FaArrowLeft onClick={onClose} />
+          <FaArrowLeft onClick={onClose} className="cursor-pointer" />
           <h2 className="font-bold text-2xl text-center  whitespace-normal">
             {projectDetail.name}
           </h2>
@@ -71,7 +88,16 @@ const ProjectDetail = () => {
           <div className="flex flex-col gap-2 justify-center items-start md:flex-row p-8 shadow-md shadow-dark-blue h-full">
             <div className="border border-olive-green mx-2 rounded-md shadow-md flex flex-col p-4 items-start w-full h-auto">
               <p>
-                <b>Description:</b> {projectDetail.description}
+                <b>Description:</b>{" "}
+                {expanded
+                  ? projectDetail.description
+                  : truncatedDescription(projectDetail.description)}
+                {!expanded && (
+                  <FaChevronDown
+                    onClick={toggleExpansion}
+                    className="cursor-pointer mx-auto text-lg hover:text-olive-green"
+                  />
+                )}
               </p>
               <p>
                 <b>Start Date: </b>
@@ -109,7 +135,7 @@ const ProjectDetail = () => {
                       {projectDetail.teamMembers.map((teammember) => (
                         <table>
                           <tbody key={teammember.id}>
-                            <tr >
+                            <tr>
                               <td className=" flex flex-row items-center gap-2 ">
                                 {teammember.profileImage ? (
                                   <img
