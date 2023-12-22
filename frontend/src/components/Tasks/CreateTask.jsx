@@ -1,54 +1,34 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  createProject,
-  getAllProjects,
-  reset,
-} from "../../features/Projects/projectSlice";
-import { getAllUsers } from "../../features/users/userSlice";
-import Select from "react-select";
+import { createTask, reset } from "../../features/Tasks/taskSlice";
 import { toast } from "react-toastify";
 import Modal from "react-modal";
 import { FaSpinner } from "react-icons/fa";
 import { MdClose } from "react-icons/md";
+
 Modal.setAppElement("#root");
 
-const CreateProject = ({ onClose }) => {
+const CreateTask = ({ onClose }) => {
   const dispatch = useDispatch();
+  const { isLoading, isError, isSuccess, message } = useSelector(
+    (state) => state.task
+  );
   const { users} = useSelector(
     (state) => state.users
   );
-  const { projects,isLoading, isError, isSuccess, message } = useSelector(
+  const { projects } = useSelector(
     (state) => state.project
   );
-  const { user } = useSelector((state) => state.auth);
-  const [projectData, setProjectData] = useState({
-    name: "",
-    description: "",
-    startDate: "",
-    scrumMaster: "",
-    teamMembers: [],
-    tasks: [],
-    status: "open",
+  const [taskData, setTaskData] = useState({
+    name:"",
+    description : "",
+    deadline: "",
+    status : "To Do",
+    assignee : ""
   });
-  const [scrumMasterOptions, setScrumMasterOptions] = useState([]);
   const [devTeamOptions, setDevTeamOptions] = useState([]);
 
   useEffect(() => {
-    dispatch(getAllUsers());
-  }, [dispatch]);
-
-  useEffect(() => {
-    // add options for the Scrum Master Selection
-    const ScrumOptions = users
-      .filter((user) => user.role === "Scrum Master")
-      .map((user) => ({
-        value: user._id,
-        label: user.username,
-      }));
-    setScrumMasterOptions(ScrumOptions);
-
-    // add options for the Team members dropdown
     const devOptions = users
       .filter((user) => user.role === "Development Team")
       .map((user) => ({
@@ -56,20 +36,13 @@ const CreateProject = ({ onClose }) => {
         label: user.username,
       }));
     setDevTeamOptions(devOptions);
-  }, [users, isLoading, isError, isSuccess]);
+  }, [users]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setProjectData((prevData) => ({
+    setTaskData((prevData) => ({
       ...prevData,
       [name]: value,
-    }));
-  };
-
-  const handleScrumMasterChange = (selectedOption) => {
-    setProjectData((prevData) => ({
-      ...prevData,
-      scrumMaster: selectedOption,
     }));
   };
 
@@ -84,36 +57,32 @@ const CreateProject = ({ onClose }) => {
       teamMembers: selectedValues,
     }));
   };
+  
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    // get ScrumMaster's id
-    const scrumMasterId =
-      projectData.scrumMaster && projectData.scrumMaster.value;
-    // fetch selected development team member's Id
     const devTeamIDs =
-      projectData.teamMembers?.map((member) => member.value) || [];
+    taskData.assignee?.map((member) => member.value) || [];
 
-    dispatch(
-      createProject({
-        ...projectData,
-        scrumMaster: scrumMasterId,
+    dispatch(createTask({
+        taskData,
         teamMembers: devTeamIDs,
-      })
-    );
+    }));
+
     if (isError) {
-      toast.error(message);
-    }
-    if (isSuccess) {
-      onClose();
-      toast.success("Project created successfully");
-      dispatch(getAllProjects())
-    }
+        toast.error(message);
+        dispatch(reset());
+      }
+      if (isSuccess) {
+        onClose();
+        toast.success("Task created successfully");
+        dispatch(reset());
+      }
   };
 
   return (
     <Modal
       isOpen={true}
-      contentLabel="Create New Project"
+      contentLabel="Create New Task"
       className="fixed top-0 left-0 w-full h-full flex justify-center items-center"
       overlayClassName="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center"
       onRequestClose={onClose}
@@ -137,7 +106,7 @@ const CreateProject = ({ onClose }) => {
             type="text"
             id="name"
             name="name"
-            value={projectData.name}
+            value={taskData.name}
             onChange={handleInputChange}
             className="border border-gray rounded-md  py-1 focus:outline-blue"
             required
@@ -145,9 +114,9 @@ const CreateProject = ({ onClose }) => {
           <label htmlFor="description">Start Date: </label>
           <input
             type="date"
-            id="startDate"
-            name="startDate"
-            value={projectData.startDate}
+            id="deadline"
+            name="deadline"
+            value={taskData.deadline}
             onChange={handleInputChange}
             className="border border-gray rounded-md  py-1 focus:outline-blue"
             required
@@ -159,31 +128,20 @@ const CreateProject = ({ onClose }) => {
               rows={5}
               id="description"
               name="description"
-              value={projectData.description}
+              value={task.description}
               onChange={handleInputChange}
               className="border border-gray rounded-md  py-1 focus:outline-blue"
               required
             />
           </label>
           <div className="flex flex-col">
-            <label htmlFor="scrumMaster" className="pt-4">
-              Scrum Master:
-            </label>
-            <Select
-              id="scrumMaster"
-              name="scrumMaster"
-              value={projectData.scrumMaster}
-              onChange={handleScrumMasterChange}
-              options={scrumMasterOptions}
-              required
-            />
             <label htmlFor="teamMembers" className="pt-4">
               Development Team:
             </label>
             <Select
               id="teamMembers"
               name="teamMembers"
-              value={projectData.teamMembers}
+              value={taskData.assignee}
               onChange={handleTeamMemeberChange}
               options={devTeamOptions}
               isMulti
@@ -195,7 +153,7 @@ const CreateProject = ({ onClose }) => {
               className="p-2 border rounded-md border-olive-green text-olive-green font-bold hover:bg-olive-green hover:text-white"
               disabled={isLoading}
             >
-              {isLoading ? "Creating..." : "Create Project"}
+              {isLoading ? "Creating..." : "Create Task"}
             </button>
           </div>
         </form>
@@ -204,4 +162,4 @@ const CreateProject = ({ onClose }) => {
   );
 };
 
-export default CreateProject;
+export default CreateTask;

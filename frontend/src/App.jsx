@@ -52,9 +52,7 @@ const App = () => {
         <Route path="/dashboard/project/:id" 
             element={user ? (
               <>
-                {user.role === "Product Owner" && <ProjectDetail  />}
                 {user.role === "Scrum Master" && <ProjectDetail  />}
-                {user.role === "Development Team" && <ProjectDetail  />}
               </>
             ) : (
               <Navigate to="/dashboard" />
