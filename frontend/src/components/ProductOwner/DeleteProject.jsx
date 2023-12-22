@@ -18,7 +18,7 @@ const DeleteProject = ({ project_id, onClose }) => {
     project._id === project_id && (selectedProject = project.name);
   });
 
-  const { user } = useSelector((state) => state.auth);
+  // const { user } = useSelector((state) => state.auth);
   const handleDelete = async() => {
     await dispatch(deleteProject(project_id));
     if(isSuccess){
