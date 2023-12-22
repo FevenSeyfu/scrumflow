@@ -192,6 +192,18 @@ export const deleteTask = async (req, res) => {
     if (!existingTask) {
       return res.status(404).json({ message: "Task not found" });
     }
+    //  remove task from the linked project as well
+    const projectContainingTask = await Project.findOne({
+      tasks: existingTask._id,
+    });
+
+    if (projectContainingTask) {
+      projectContainingTask.tasks = projectContainingTask.tasks.filter(
+        (taskId) => taskId.toString() !== existingTask._id.toString()
+      );
+      await projectContainingTask.save();
+    }
+
 
     res.status(200).json({ message: "Task deleted successfully." });
   } catch (error) {
