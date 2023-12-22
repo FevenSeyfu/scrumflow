@@ -14,6 +14,11 @@ import AdminDashboard from "./components/Admin/AdminDashboard";
 import ProductOwnerDashboard from "./components/ProductOwner/ProductOwnerDashboard";
 import ScrumMasterDashboard from "./components/ScrumMaster/ScrumMasterDashboard";
 import DevelopmentTeamDashboard from "./components/DevelopmentTeam/DevelopmentTeamDashboard";
+
+// project
+// import ProjectDetail from './components/ProductOwner/ProjectDetail'
+import ProjectDetail from "./components/ScrumMaster/project/ProjectDetail"
+
 const App = () => {
   const { user, isLoading, isError, isSuccess, message } = useSelector(
     (state) => state.auth
@@ -44,8 +49,18 @@ const App = () => {
             )
           }
         />
+        <Route path="/dashboard/project/:id" 
+            element={user ? (
+              <>
+                {user.role === "Scrum Master" && <ProjectDetail  />}
+              </>
+            ) : (
+              <Navigate to="/dashboard" />
+            )
+          }
+        />
       </Routes>
-      <ToastContainer className='top-left' />
+      <ToastContainer/>
     </>
   );
 };

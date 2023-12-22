@@ -40,6 +40,9 @@ const Register = () => {
       toast.error(message);
     }
     if (isSuccess || user) {
+      if (message) {
+        toast.success(message);
+      }
       navigate("/users/login");
       dispatch(reset());
     }
@@ -100,13 +103,13 @@ const Register = () => {
     dispatch(register(userData));
   };
   return (
-    <div className="w-2/5  m-auto flex justify-center my-8 py-8 px-8 rounded-2xl  bg-dark-blue text-white shadow-md ">
-      <div className="w-full flex flex-col justify-center items-center px-8">
+    <div className="w-4/5 m-auto flex flex-col justify-center items-center my-8 py-8 px-4 rounded-2xl bg-dark-blue text-white shadow-md ">
+      <div className="w-full md:w-4/5 lg:w-3/5 flex flex-col items-center">
         <h2 className="text-2xl font-bolder mb-2 text-center">Sign up</h2>
         {isLoading ? <Spinner /> : ""}
         <form onSubmit={onSubmit}>
-          <div className="flex flex-row justify-between gap-2 pb-1">
-            <div className="w-2/5">
+          <div className="flex flex-row  gap-4 pb-1 justify-between ">
+            <div className="w-3/6 md:w-4/6">
               <label
                 htmlFor="firstName"
                 className="block mt-2 text-sm font-medium text-white"
@@ -123,7 +126,7 @@ const Register = () => {
                 required
               />
             </div>
-            <div className="w-2/5">
+            <div className="w-3/6 md:w-4/6">
               <label
                 htmlFor="lastName"
                 className="block mt-2 text-sm font-medium text-white"
@@ -141,8 +144,8 @@ const Register = () => {
               />
             </div>
           </div>
-          <div className="flex flex-row justify-between gap-2 pb-1">
-            <div className="w-2/5">
+          <div className="flex flex-row  gap-4 pb-1 justify-between ">
+            <div className="w-3/6 md:w-4/6">
               <label
                 htmlFor="username"
                 className="block mt-2 text-sm font-medium text-white"
@@ -159,7 +162,7 @@ const Register = () => {
                 required
               />
             </div>
-            <div className="w-2/5">
+            <div className="w-3/6 md:w-4/6">
               <label
                 htmlFor="birthDate"
                 className="block mt-2 text-sm font-medium text-white"
@@ -177,8 +180,8 @@ const Register = () => {
               />
             </div>
           </div>
-          <div className="flex flex-row justify-between gap-2 pb-4">
-            <div className="w-2/5">
+          <div className="flex flex-row  gap-4 pb-1 justify-between ">
+            <div className="w-3/6 md:w-4/6">
               <label
                 htmlFor="email"
                 className="block mt-2 text-sm font-medium text-white"
@@ -195,7 +198,7 @@ const Register = () => {
                 required
               />
             </div>
-            <div className="w-2/5">
+            <div className="w-3/6 md:w-4/6">
               <label
                 htmlFor="password"
                 className="block mt-2 text-sm font-medium text-white"
@@ -325,6 +328,7 @@ const Register = () => {
             <button
               type="submit"
               className="text-white  bg-olive-green py-2 px-4 rounded-lg"
+              disabled={isLoading}
             >
               Signup
             </button>

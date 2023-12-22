@@ -1,20 +1,10 @@
 import React from 'react'
 import Layout from '../common/Layout'
-import AssignTeamToTask from './AssignTeamToTask'
-import CreateTask from './CreateTask'
-import ProjectDetails from './ProjectDetails'
-import SprintManagement from './SprintManagement'
-import TaskManagement from './TaskManagement'
-
+import ProjectList from './project/ProjectList'
 const ScrumMasterDashboard = () => {
   return (
     <Layout>
-      scrum master
-        <AssignTeamToTask />
-        <CreateTask />
-        <ProjectDetails />
-        <SprintManagement />
-        <TaskManagement />
+        <ProjectList />
     </Layout>
   )
 }

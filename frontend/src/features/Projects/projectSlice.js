@@ -3,6 +3,7 @@ import projectService from "./projectService";
 
 const initialState = {
   projects: [],
+  projectDetail: null,
   isLoading: false,
   isError: false,
   isSuccess: false,
@@ -11,31 +12,21 @@ const initialState = {
 
 const handleError = (error, thunkAPI) => {
   const message =
-    (error.response && error.response.data && error.response.message) ||
+    (error.response && error.response.data && error.response.data.message) ||
     error.message ||
     error.toString();
 
   return thunkAPI.rejectWithValue(message);
 };
 
-export const createProject = createAsyncThunk(
-  "project/createProject",
-  async (projectData, thunkAPI) => {
-    try {
-      const token = thunkAPI.getState().auth.user.token;
-      return await projectService.createProject(projectData, token);
-    } catch (error) {
-      return handleError(error, thunkAPI);
-    }
-  }
-);
+
 
 export const getAllProjects = createAsyncThunk(
   "project/getAllProjects",
-  async (projectownerId, thunkAPI) => {
+  async (_,thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      return await projectService.getAllProjects(projectownerId, token);
+      return await projectService.getAllProjects(token);
     } catch (error) {
       return handleError(error, thunkAPI);
     }
@@ -54,12 +45,24 @@ export const getProjectById = createAsyncThunk(
   }
 );
 
+export const createProject = createAsyncThunk(
+  "project/createProject",
+  async (projectData, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.user.token;
+      return await projectService.createProject(projectData, token);
+    } catch (error) {
+      return handleError(error, thunkAPI);
+    }
+  }
+);
+
 export const updateProject = createAsyncThunk(
   "project/updateProject",
   async ({ projectData, project_id }, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      return await projectService.updateProject(projectData, project_id, token);
+      return projectService.updateProject(projectData, project_id, token);
     } catch (error) {
       return handleError(error, thunkAPI);
     }
@@ -135,7 +138,7 @@ export const projectSlice = createSlice({
       .addCase(getProjectById.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.projects = action.payload;
+        state.projectDetail = action.payload;
       })
       .addCase(getProjectById.rejected, (state, action) => {
         state.isLoading = false;

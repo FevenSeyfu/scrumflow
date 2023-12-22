@@ -18,7 +18,8 @@ export default {
       "black" : "#000",
       'blue': '#0d6efd',
       'red' : '#dc3545',
-      'green' : '#198754'
+      'green' : '#198754',
+      'gray' : '#6b7280'
     },
     screens: {
       'sm': '640px',

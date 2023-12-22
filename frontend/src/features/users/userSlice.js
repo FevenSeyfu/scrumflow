@@ -3,6 +3,7 @@ import userService from "./userService";
 
 const initialState = {
     users: [],
+    user:null,
     isError: false,
     isSuccess: false,
     isLoading: false,
@@ -49,7 +50,9 @@ export const updateUser = createAsyncThunk(
         try {
             const { userId, updatedData } = userData;
             const token = thunkAPI.getState().auth.user.token;
-            return await userService.updateUser(userId, updatedData, token);
+            await userService.updateUser(userId, updatedData, token);
+            const updatedUsers = await userService.getAllUsers(token);
+            return updatedUsers;
         } catch (error) {
             const message =
                 (error.response && error.response.data && error.response.message) ||
@@ -87,6 +90,7 @@ export const userSlice = createSlice({
             state.isError = false;
             state.isSuccess = false;
             state.message = "";
+            state.user = null
         },
     },
     extraReducers: (builder) => {

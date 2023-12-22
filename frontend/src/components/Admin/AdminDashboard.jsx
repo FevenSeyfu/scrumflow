@@ -1,14 +1,15 @@
 import React from 'react'
-import UpdateUserProfile from './UpdateUserProfile'
 import UserList from './UserList'
 import Layout from '../common/Layout'
+import { ToastContainer } from 'react-toastify'
 
 const AdminDashboard = () => {
   return (
     <Layout>
-      admin
-        <UpdateUserProfile />
-        <UserList />
+        <ToastContainer />
+        <div>
+          <UserList />
+        </div>
     </Layout>
   )
 }

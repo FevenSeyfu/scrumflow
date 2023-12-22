@@ -17,7 +17,7 @@ const Header = () => {
   return (
     <div className="bg-dark-blue text-light-gray flex flex-row items-center justify-between p-4">
       <Link to="/" id="logo">
-        <h1 className="font-thin text-2xl text-">SCRUM FLOW</h1>
+        <h1 className="font-bold text-2xl text-">SCRUM FLOW</h1>
       </Link>
       <nav>
         <ul className="flex flex-row gap-4">
@@ -25,7 +25,7 @@ const Header = () => {
             <>
               <button onClick={() => setMenuOpen(!isMenuOpen)}>
                 {user.profileImage ? (
-                  <img src={user.profileImage} alt="" />
+                  <img src={user.profileImage} alt="profile image" className="w-8 h-8 rounded-full"/>
                 ) : (
                   <RxAvatar size={30} />
                 )}

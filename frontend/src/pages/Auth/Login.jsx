@@ -23,13 +23,16 @@ const Login = () => {
     if (isError) {
       toast.error(message);
     }
+  
     if (isSuccess || user) {
-      toast.success(message)
+      if (message) {
+        toast.success(message);
+      }
       navigate("/dashboard");
     }
-
+  
     dispatch(reset());
-  }, [user, isError, isSuccess, message, navigate, dispatch]);
+  }, [user, isError, isSuccess, message]);
 
   const onChange = (e) => {
     setFormData((prevState) => ({
@@ -56,7 +59,7 @@ const Login = () => {
           <div className="mb-4">
             <label
               htmlFor="email"
-              className="block text-sm font-medium text-gray"
+              className="block text-sm font-medium text-white"
             >
               Email
             </label>
@@ -73,7 +76,7 @@ const Login = () => {
           <div className="mb-4">
             <label
               htmlFor="password"
-              className="block text-sm font-medium text-light-gray"
+              className="block text-sm font-medium text-light-white"
             >
               Password
             </label>
@@ -97,11 +100,11 @@ const Login = () => {
             <div className="flex flex-row ">
               <label
                 htmlFor="rememberMe"
-                className="text-sm font-medium text-gray mr-6"
+                className="text-sm font-medium text-white mr-6"
               >
                 Remember me
               </label>
-              <p className="text-sm text-gray">
+              <p className="text-sm text-white">
                 <a href="#">Forgot Password?</a>
               </p>
             </div>
@@ -109,11 +112,12 @@ const Login = () => {
           <button
             type="submit"
             className="w-3/6 text-white  bg-olive-green rounded-2xl mt-4 py-2 ml-12 mb-2"
+            disabled={isLoading}
           >
             Sign In
           </button>
         </form>
-        <p className="text-gray">
+        <p className="text-white">
           Don't have an accound?
           <Link to="/users/" className="text-olive-green hover:underline">
             Sign Up

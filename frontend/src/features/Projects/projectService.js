@@ -13,23 +13,23 @@ const createProject = async (projectData,token) => {
     return response.data
 }
 // router.get('/',protect, getAllProjects);
-const getAllProjects = async (projectownerId,token) => {
+const getAllProjects = async (token) => {
     const config = {
         headers: {
             Authorization: `Bearer ${token}`,
         },
     }
-    const response = await axios.get(PROJECT_URL+projectownerId,config)
+    const response = await axios.get(PROJECT_URL,config);
     return response.data
 }
 // router.get('/:id',protect, getProjectById);
-const getProjectById = async (project_id,token) => {
+const getProjectById = async (project_id, token) => {
     const config = {
         headers: {
             Authorization: `Bearer ${token}`,
         },
     }
-    const response = await axios.get(PROJECT_URL+project_id,config)
+    const response = await axios.get(`${PROJECT_URL}${project_id}`, config);
     return response.data
 }
 // router.put('/:id',protect, updateProject);
@@ -39,7 +39,7 @@ const updateProject = async (projectData,project_id,token) => {
             Authorization: `Bearer ${token}`,
         },
     }
-    const response = await axios.put(PROJECT_URL+project_id,projectData,config)
+    const response = await axios.put(`${PROJECT_URL}${project_id}`,projectData,config)
     return response.data
 }
 // router.put('/:id/assign', protect, assignProject);
@@ -53,13 +53,13 @@ const assignProject = async (projectData,project_id,token) => {
     return response.data
 }
 // router.delete('/:id',protect, deleteProject);
-const deleteProject = async (projectData,project_id,token) => {
+const deleteProject = async (project_id, token) => {
     const config = {
         headers: {
             Authorization: `Bearer ${token}`,
         },
     }
-    const response = await axios.delete(PROJECT_URL+project_id,projectData,config)
+    const response = await axios.delete(`${PROJECT_URL}${project_id}`, config);
     return response.data
 }
 
