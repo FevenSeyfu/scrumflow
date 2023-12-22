@@ -108,8 +108,8 @@ const ProjectDetail = () => {
                     <div>
                       {projectDetail.teamMembers.map((teammember) => (
                         <table>
-                          <tbody>
-                            <tr key={teammember._id}>
+                          <tbody key={teammember.id}>
+                            <tr >
                               <td className=" flex flex-row items-center gap-2 ">
                                 {teammember.profileImage ? (
                                   <img

@@ -20,7 +20,7 @@ const UpdateProject = ({ project_id, onClose }) => {
   const { project, isLoading, isError, isSuccess, message } = useSelector(
     (state) => state.project
   );
-  const projects = useSelector((state) => state.project.projects); // Adjust as needed
+  const projects = useSelector((state) => state.project.projects);
   const { users } = useSelector((state) => state.users);
   const { user } = useSelector((state) => state.auth);
 
@@ -39,8 +39,10 @@ const UpdateProject = ({ project_id, onClose }) => {
   const [selectedTeamMembers, setSelectedTeamMembers] = useState([]);
   const [scrumMasterOptions, setScrumMasterOptions] = useState([]);
   const [devTeamOptions, setDevTeamOptions] = useState([]);
+  const [prevScrumMaster, setPrevScrumMaster] = useState(null);
+  const [prevTeamMembers, setPrevTeamMembers] = useState([]);
+
   useEffect(() => {
-    // Dispatch getAllUsers
     dispatch(getAllUsers());
   }, [dispatch]);
 
@@ -54,6 +56,9 @@ const UpdateProject = ({ project_id, onClose }) => {
           );
 
           if (selectedProject) {
+            setPrevScrumMaster(selectedProject.scrumMaster);
+            setPrevTeamMembers(selectedProject.teamMembers);
+
             setUpdatedData({
               name: selectedProject.name || "",
               startDate: selectedProject.startDate
@@ -65,18 +70,18 @@ const UpdateProject = ({ project_id, onClose }) => {
               projectOwner: user.id || "",
               scrumMaster: selectedProject.scrumMaster?._id || "",
               teamMembers:
-                selectedProject.teamMembers?.map((member) => member._id) || [],
+                selectedProject.teamMembers ?.map((member) => member._id) || "",
               tasks: [],
               status: "open",
             });
+
             setSelectedScrumMaster(selectedProject.scrumMaster);
             setSelectedTeamMembers(
-              selectedProject.teamMembers?.map((member) => member._id) || []
+              selectedProject.teamMembers.map((member) => member._id)
             );
           }
         }
 
-        // Set options for Scrum Master
         const scrumOptions = users
           .filter((user) => user.role === "Scrum Master")
           .map((user) => ({
@@ -84,7 +89,6 @@ const UpdateProject = ({ project_id, onClose }) => {
             label: user.username,
           }));
 
-        // Set options for Development Team
         const devOptions = users
           .filter((user) => user.role === "Development Team")
           .map((user) => ({
@@ -104,17 +108,24 @@ const UpdateProject = ({ project_id, onClose }) => {
   }, [dispatch, project_id, projects, user.id, users]);
 
   const handleScrumMasterChange = (selectedOption) => {
+    const newScrumMaster = selectedOption ? selectedOption.value : prevScrumMaster;
+
     setUpdatedData((prevState) => ({
       ...prevState,
-      scrumMaster: selectedOption.value,
+      scrumMaster: newScrumMaster,
     }));
     setSelectedScrumMaster(selectedOption);
   };
 
   const handleTeamMemberChange = (selectedOptions) => {
+    const newTeamMembers =
+      selectedOptions.length > 0
+        ? selectedOptions.map((option) => option.value)
+        : prevTeamMembers;  
+  
     setUpdatedData((prevState) => ({
       ...prevState,
-      teamMembers: selectedOptions.map((option) => option.value),
+      teamMembers: newTeamMembers,
     }));
     setSelectedTeamMembers(selectedOptions);
   };
@@ -130,18 +141,19 @@ const UpdateProject = ({ project_id, onClose }) => {
     e.preventDefault();
 
     try {
-      const scrumMasterId = selectedScrumMaster?.value || "";
+      const scrumMasterId = selectedScrumMaster?.value;
       const devTeamIDs =
-        selectedTeamMembers.map((member) => member.value) || [];
+        selectedTeamMembers.map((member) => member.value);
 
       const projectData = {
         ...updatedData,
         scrumMaster: scrumMasterId,
         teamMembers: devTeamIDs,
       };
-      await dispatch(updateProject({projectData, project_id}));
+      console.log(prevTeamMembers)
+      await dispatch(updateProject({ projectData, project_id }));
 
-      if (isSuccess) {  
+      if (isSuccess) {
         await dispatch(getAllProjects());
         setUpdatedData({
           name: "",
