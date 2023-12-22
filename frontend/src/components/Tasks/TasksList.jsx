@@ -3,9 +3,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAllTasks, reset } from "../../features/Tasks/taskSlice";
 import { getAllUsers } from "../../features/users/userSlice";
 import TaskDetail from "./TaskDetail";
+import CreateTask from "./CreateTask";
+
 const TasksList = ({ ProjectTasks }) => {
   const dispatch = useDispatch();
   const [showTaskModal, setShowTaskModal] = useState(false);
+  const [showCreateTaskModal, setShowCreateTaskModal] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
   const tasks = useSelector((state) => state.task);
   const { users } = useSelector((state) => state.users);
@@ -52,13 +55,15 @@ const TasksList = ({ ProjectTasks }) => {
     "In Progress": [],
     Done: [],
   };
-
   ProjectTasks.forEach((task) => {
     columns[task.status].push(task);
   });
 
   return (
     <>
+      {showCreateTaskModal && (
+        <CreateTask onClose={() => setShowCreateTaskModal(false)} />
+      )}
       {Object.entries(columns).map(([status, tasks]) => (
         <div
           key={status}
@@ -74,7 +79,7 @@ const TasksList = ({ ProjectTasks }) => {
                 key={task._id}
               >
                 <div className="flex flex-row justify-between">
-                <img
+                  <img
                     src={task.assignee && getUser(task.assignee)}
                     alt={`${task.name} image`}
                     className="h-6 w-6 rounded-full"
@@ -86,15 +91,17 @@ const TasksList = ({ ProjectTasks }) => {
                       setShowTaskModal(true);
                     }}
                   >
-                    <h2 className="font-bold text-left ">{task.name.toUpperCase()}</h2>
+                    <h2 className="font-bold text-left ">
+                      {task.name.toUpperCase()}
+                    </h2>
                   </button>
-                  
                 </div>
                 <div className="justify-end">
                   <p className="text-gray text-right text-sm">
                     {task.deadline && handleDate(task.deadline)}
                   </p>
                 </div>
+
                 {showTaskModal && (
                   <TaskDetail
                     taskId={selectedTaskId}
@@ -103,6 +110,16 @@ const TasksList = ({ ProjectTasks }) => {
                 )}
               </div>
             ))
+          )}
+          {status === "To Do" && (
+            <button
+              onClick={() => {
+                setShowCreateTaskModal(true);
+              }}
+              className="text-left text-blue bg-white hover:text-dark-blue hover:underline cursor-pointer"
+            >
+              + Add Task
+            </button>
           )}
         </div>
       ))}

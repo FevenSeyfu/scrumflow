@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createTask, reset } from "../../features/Tasks/taskSlice";
+import { updateProject } from "../../features/Projects/projectSlice";
 import { toast } from "react-toastify";
+import Select from "react-select";
 import Modal from "react-modal";
 import { FaSpinner } from "react-icons/fa";
 import { MdClose } from "react-icons/md";
@@ -13,20 +15,17 @@ const CreateTask = ({ onClose }) => {
   const { isLoading, isError, isSuccess, message } = useSelector(
     (state) => state.task
   );
-  const { users} = useSelector(
-    (state) => state.users
-  );
-  const { projects } = useSelector(
-    (state) => state.project
-  );
+  const { users } = useSelector((state) => state.users);
+  const { projects,projectDetail } = useSelector((state) => state.project);
+  const project =  projects.find((project) => project._id === projectDetail._id);
   const [taskData, setTaskData] = useState({
-    name:"",
-    description : "",
+    name: "",
+    description: "",
     deadline: "",
-    status : "To Do",
-    assignee : ""
+    status: "To Do",
+    assignee: "",
   });
-  const [devTeamOptions, setDevTeamOptions] = useState([]);
+  const [devTeamOption, setDevTeamOption] = useState([]);
 
   useEffect(() => {
     const devOptions = users
@@ -35,7 +34,7 @@ const CreateTask = ({ onClose }) => {
         value: user._id,
         label: user.username,
       }));
-    setDevTeamOptions(devOptions);
+    setDevTeamOption(devOptions);
   }, [users]);
 
   const handleInputChange = (e) => {
@@ -44,39 +43,43 @@ const CreateTask = ({ onClose }) => {
       ...prevData,
       [name]: value,
     }));
+
   };
 
-  const handleTeamMemeberChange = (selectedOptions) => {
-    const selectedValues = selectedOptions.map((option) => ({
-      value: option.value,
-      label: option.label,
-    }));
-
-    setProjectData((prevData) => ({
-      ...prevData,
-      teamMembers: selectedValues,
-    }));
+  const handleTeamMemeberChange = (selectedOption) => {
+    setTaskData((prevData) => ({
+        ...prevData,
+        assignee: selectedOption,
+      }));
   };
-  
+
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    const devTeamIDs =
-    taskData.assignee?.map((member) => member.value) || [];
-
-    dispatch(createTask({
-        taskData,
-        teamMembers: devTeamIDs,
-    }));
+    const devTeamID = taskData.assignee && taskData.assignee.value
+    dispatch(
+      createTask({
+        ...taskData,
+        assignee: devTeamID,
+      })
+    );
 
     if (isError) {
-        toast.error(message);
-        dispatch(reset());
-      }
-      if (isSuccess) {
-        onClose();
-        toast.success("Task created successfully");
-        dispatch(reset());
-      }
+      toast.error(message);
+      dispatch(reset());
+    }
+    if (isSuccess) {
+      onClose();
+      toast.success("Task created successfully");
+      const newTaskId = message;
+      const project_id = projectDetail._id
+      const updatedTasks = [...project.tasks, newTaskId];
+      const updatedProject = {
+        ...project,
+        tasks: updatedTasks,
+      };
+      dispatch(updateProject({ projectData:updatedProject, project_id }))
+      dispatch(reset());
+    }
   };
 
   return (
@@ -92,15 +95,12 @@ const CreateTask = ({ onClose }) => {
         <div className="flex justify-end">
           <MdClose size={30} onClick={onClose} />
         </div>
-        <h2 className="font-bold text-2xl text-center">
-          Create New Project
-        </h2>
+        <h2 className="font-bold text-2xl text-center">Create New Project</h2>
         {isLoading && <FaSpinner />}
         <form
           onSubmit={handleFormSubmit}
           className="p-8 shadow-lg rounded-md flex flex-col "
         >
-          <div className="flex flex-col md:flex-row  md:gap-4 md:items-center">
           <label htmlFor="name">Name:</label>
           <input
             type="text"
@@ -121,32 +121,28 @@ const CreateTask = ({ onClose }) => {
             className="border border-gray rounded-md  py-1 focus:outline-blue"
             required
           />
-          </div>
           <label htmlFor="description" className="flex flex-col  mt-2">
             Description:
             <textarea
               rows={5}
               id="description"
               name="description"
-              value={task.description}
+              value={taskData.description}
               onChange={handleInputChange}
               className="border border-gray rounded-md  py-1 focus:outline-blue"
               required
             />
           </label>
-          <div className="flex flex-col">
-            <label htmlFor="teamMembers" className="pt-4">
-              Development Team:
-            </label>
-            <Select
-              id="teamMembers"
-              name="teamMembers"
-              value={taskData.assignee}
-              onChange={handleTeamMemeberChange}
-              options={devTeamOptions}
-              isMulti
-            />
-          </div>
+          <label htmlFor="teamMembers" className="pt-4">
+            Development Team:
+          </label>
+          <Select
+            id="teamMembers"
+            name="teamMembers"
+            value={taskData.assignee}
+            onChange={handleTeamMemeberChange}
+            options={devTeamOption}
+          />
           <div className="flex justify-center my-2">
             <button
               type="submit"
