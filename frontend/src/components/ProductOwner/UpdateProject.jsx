@@ -67,7 +67,7 @@ const UpdateProject = ({ project_id, onClose }) => {
                     .split("T")[0]
                 : "",
               description: selectedProject.description || "",
-              projectOwner: user.id || "",
+              projectOwner: selectedProject.projectOwner,
               scrumMaster: selectedProject.scrumMaster?._id || "",
               teamMembers:
                 selectedProject.teamMembers ?.map((member) => member._id) || "",
@@ -141,17 +141,15 @@ const UpdateProject = ({ project_id, onClose }) => {
     e.preventDefault();
 
     try {
-      const scrumMasterId = selectedScrumMaster?.value;
-      const devTeamIDs =
-        selectedTeamMembers.map((member) => member.value);
+      const scrumMasterId = selectedScrumMaster?.value || prevScrumMaster;
+      const devTeamIDs = selectedTeamMembers.map((member) => member.value) || prevTeamMembers;
 
-      const projectData = {
-        ...updatedData,
+      setUpdatedData((prevState) => ({
+        ...prevState,
         scrumMaster: scrumMasterId,
         teamMembers: devTeamIDs,
-      };
-      console.log(prevTeamMembers)
-      await dispatch(updateProject({ projectData, project_id }));
+      }));
+      await dispatch(updateProject({ projectData: updatedData, project_id }));
 
       if (isSuccess) {
         await dispatch(getAllProjects());

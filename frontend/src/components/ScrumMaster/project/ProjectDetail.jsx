@@ -9,7 +9,7 @@ import { FaSpinner, FaUser, FaArrowLeft, FaChevronDown } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import TasksList from "../../Tasks/TasksList";
 import Layout from "../../common/Layout";
-
+import { toast } from "react-toastify";
 const ProjectDetail = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
