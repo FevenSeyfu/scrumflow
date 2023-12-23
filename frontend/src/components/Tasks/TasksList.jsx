@@ -4,14 +4,17 @@ import { getAllTasks, reset } from "../../features/Tasks/taskSlice";
 import { getAllUsers } from "../../features/users/userSlice";
 import TaskDetail from "./TaskDetail";
 import CreateTask from "./CreateTask";
+import { FaTrash } from "react-icons/fa";
+import DeleteTask from "./DeleteTask";
 
 const TasksList = ({ ProjectTasks }) => {
   const dispatch = useDispatch();
-  const [showTaskModal, setShowTaskModal] = useState(false);
-  const [showCreateTaskModal, setShowCreateTaskModal] = useState(false);
-  const [selectedTaskId, setSelectedTaskId] = useState(null);
   const tasks = useSelector((state) => state.task);
   const { users } = useSelector((state) => state.users);
+  const [selectedTaskId, setSelectedTaskId] = useState(null);
+  const [showTaskModal, setShowTaskModal] = useState(false);
+  const [showCreateTaskModal, setShowCreateTaskModal] = useState(false);
+  const [showDeleteTaskModal, setShowDeleteTaskModal] = useState(false);
 
   useEffect(() => {
     dispatch(getAllUsers());
@@ -78,7 +81,7 @@ const TasksList = ({ ProjectTasks }) => {
                 className="border border-olive-green rounded-lg w-full p-2 flex flex-col justify-between items-start"
                 key={task._id}
               >
-                <div className="flex flex-row justify-between">
+                <div className="flex flex-row justify-evenly">
                   <img
                     src={task.assignee && getUser(task.assignee)}
                     alt={`${task.name} image`}
@@ -95,8 +98,16 @@ const TasksList = ({ ProjectTasks }) => {
                       {task.name.toUpperCase()}
                     </h2>
                   </button>
+                  <FaTrash
+                    className="text-red"
+                    onClick={() => {
+                      setSelectedTaskId(task._id);
+                      setShowDeleteTaskModal(true);
+                    }}
+                  />
                 </div>
-                <div className="justify-end">
+                
+                <div className="flex flex-row justify-end">
                   <p className="text-gray text-right text-sm">
                     {task.deadline && handleDate(task.deadline)}
                   </p>
@@ -106,6 +117,12 @@ const TasksList = ({ ProjectTasks }) => {
                   <TaskDetail
                     taskId={selectedTaskId}
                     onClose={() => setShowTaskModal(false)}
+                  />
+                )}
+                {showDeleteTaskModal && (
+                  <DeleteTask
+                    taskId={selectedTaskId}
+                    onClose={() => setShowDeleteTaskModal(false)}
                   />
                 )}
               </div>

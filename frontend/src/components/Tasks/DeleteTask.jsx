@@ -1,20 +1,24 @@
 import React from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import  { deleteTask} from '../../features/Tasks/taskSlice'
 import Modal from "react-modal";
 import { toast } from "react-toastify";
 import { FaSpinner } from "react-icons/fa";
 import { MdClose } from "react-icons/md";
-
 Modal.setAppElement("#root");
 
 const DeleteTask = ({taskId, onClose}) => {
   const dispatch = useDispatch();
+  const {tasks,isError,isLoading,isSuccess,message} = useSelector((state) => state.task);
+
   const handleDelete = async() => {
     await dispatch(deleteTask(taskId));
+    if(isError){
+      toast.error(message)
+    }
     if(isSuccess){
       onClose()
-      toast.warn('Project Deleted!')
+      toast.warn('Task Deleted!')
     }
   };
   return (
@@ -41,7 +45,7 @@ const DeleteTask = ({taskId, onClose}) => {
         >
           {isLoading ? "Deleting..." : "Delete"}
         </button>
-        <button className="bg-gray text-white p-2 rounded-md" onClick={handleClose} disabled={isLoading}>
+        <button className="bg-gray text-white p-2 rounded-md" onClick={onClose} disabled={isLoading}>
           Cancel
         </button>
       </div>
