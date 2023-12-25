@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createTask, reset } from "../../features/Tasks/taskSlice";
+import { createTask, getAllTasks, reset } from "../../features/Tasks/taskSlice";
 import { updateProject } from "../../features/Projects/projectSlice";
 import { toast } from "react-toastify";
 import Select from "react-select";
@@ -53,7 +53,7 @@ const CreateTask = ({ onClose }) => {
       }));
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async(e) => {
     e.preventDefault();
     const devTeamID = taskData.assignee && taskData.assignee.value
     dispatch(
@@ -77,7 +77,8 @@ const CreateTask = ({ onClose }) => {
         ...project,
         tasks: updatedTasks,
       };
-      dispatch(updateProject({ projectData:updatedProject, project_id }))
+      await dispatch(updateProject({ projectData:updatedProject, project_id }))
+      await dispatch(getAllTasks)
       dispatch(reset());
     }
   };
