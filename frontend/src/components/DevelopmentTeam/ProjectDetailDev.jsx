@@ -4,14 +4,14 @@ import {
   getAllProjects,
   getProjectById,
   reset,
-} from "../../../features/Projects/projectSlice";
+} from "../../features/Projects/projectSlice";
 import { FaSpinner, FaUser, FaArrowLeft, FaChevronDown } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
-import TasksList from "../../Tasks/TasksList";
+import TasksList from "../Tasks/TasksList";
 import Layout from "../common/Layout";
 import { toast } from "react-toastify";
 
-const ProjectDetail = () => {
+const ProjectDetailDev = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState(false);
@@ -168,4 +168,4 @@ const ProjectDetail = () => {
   );
 };
 
-export default ProjectDetail;
+export default ProjectDetailDev;
