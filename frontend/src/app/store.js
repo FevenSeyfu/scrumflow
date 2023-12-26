@@ -11,8 +11,8 @@ import { persistReducer, persistStore } from "redux-persist";
 const persistConfig = {
   key: "root",
   storage,
+  blacklist: ["task","auth"],
 };
-
 const rootReducer = combineReducers({
   auth: authReducer,
   users: userReducer,

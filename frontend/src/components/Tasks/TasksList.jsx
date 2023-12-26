@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllTasks, reset } from "../../features/Tasks/taskSlice";
+import { getAllProjects, reset } from "../../features/Projects/projectSlice";
 import { getAllUsers } from "../../features/users/userSlice";
 import TaskDetail from "./TaskDetail";
 import CreateTask from "./CreateTask";
 import { FaTrash } from "react-icons/fa";
 import DeleteTask from "./DeleteTask";
 
-const TasksList = ({ ProjectTasks }) => {
+const TasksList = ({ ProjectId }) => {
   const dispatch = useDispatch();
   const tasks = useSelector((state) => state.task);
   const { users } = useSelector((state) => state.users);
@@ -24,7 +24,7 @@ const TasksList = ({ ProjectTasks }) => {
     return user && user.profileImage;
   };
   useEffect(() => {
-    dispatch(getAllTasks());
+    dispatch(getAllProjects());
     return () => {
       dispatch(reset());
     };
@@ -53,11 +53,22 @@ const TasksList = ({ ProjectTasks }) => {
 
     return `${monthName} ${day}, ${year}`;
   };
+  const isDeadlineNear = (deadline) => {
+    const deadlineDate = new Date(deadline);
+    const currentDate = new Date();
+    const timeDifference = deadlineDate.getTime() - currentDate.getTime();
+    const daysDifference = Math.ceil(timeDifference / (1000 * 3600 * 24));
+
+    return daysDifference <= 3;
+  };
   const columns = {
     "To Do": [],
     "In Progress": [],
     Done: [],
   };
+  const { projects } = useSelector((state) => state.project);
+  const projectDetail = projects.find((project) => project._id === ProjectId);
+  const ProjectTasks = projectDetail.tasks;
   ProjectTasks.forEach((task) => {
     columns[task.status].push(task);
   });
@@ -106,9 +117,13 @@ const TasksList = ({ ProjectTasks }) => {
                     }}
                   />
                 </div>
-                
+
                 <div className="flex flex-row justify-end">
-                  <p className="text-gray text-right text-sm">
+                  <p
+                    className={`text-right text-sm ${
+                      isDeadlineNear(task.deadline) ? "text-red" : "text-gray"
+                    }`}
+                  >
                     {task.deadline && handleDate(task.deadline)}
                   </p>
                 </div>

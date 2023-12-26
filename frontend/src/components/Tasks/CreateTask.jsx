@@ -65,16 +65,13 @@ const CreateTask = ({ onClose }) => {
       }));
   };
 
-  const handleFormSubmit = async(e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
-    const devTeamID = taskData.assignee && taskData.assignee.value
-    dispatch(
-      createTask({
-        ...taskData,
-        assignee: devTeamID,
-      })
-    );
+    const devTeamID = taskData.assignee && taskData.assignee.value;
+    dispatch(createTask({ ...taskData, assignee: devTeamID }));
+  };
 
+  useEffect(() => {
     if (isTaskError) {
       toast.error(taskMessage);
       dispatch(reset());
@@ -92,14 +89,8 @@ const CreateTask = ({ onClose }) => {
 
       dispatch(updateProject({ projectData: updatedProject, project_id }));
     }
-  };
-  useEffect(() => {
-    if (isProjectSuccess) {
-      
-      dispatch(getAllProjects());
-      dispatch(reset());
-    }
-  }, [isProjectSuccess, dispatch,]);
+  }, [isTaskError, isTaskSuccess, taskMessage, dispatch, onClose, project, projectDetail]);
+
   return (
     <Modal
       isOpen={true}

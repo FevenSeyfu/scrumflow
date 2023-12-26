@@ -30,7 +30,6 @@ const ProjectDetail = () => {
     (state) => state.project
   );
   const projectDetail = projects.find((project) => project._id === project_id);
-  const ProjectTasks = projectDetail.tasks;
   useEffect(() => {
     dispatch(getProjectById(project_id));
   }, [dispatch]);
@@ -161,7 +160,7 @@ const ProjectDetail = () => {
                 </div>
               </div>
             </div>
-            {ProjectTasks && <TasksList ProjectTasks={ProjectTasks} />}
+            {projectDetail.tasks && <TasksList ProjectId={project_id} />}
           </div>
         )}
       </div>
