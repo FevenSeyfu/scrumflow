@@ -1,14 +1,11 @@
 import React from 'react'
 import Layout from '../common/Layout'
-import TaskDetails from './TaskDetails'
-import UpdateTask from './UpdateTask'
+import ProjectList from './ProjectList'
 
 const DevelopmentTeamDashboard = () => {
   return (
     <Layout>
-      Dev Team
-      <TaskDetails />
-      <UpdateTask />
+      <ProjectList />
     </Layout>
   )
 }

@@ -123,7 +123,7 @@ const CreateTask = ({ onClose }) => {
             className="border border-gray rounded-md  py-1 focus:outline-blue"
             required
           />
-          <label htmlFor="description">Start Date: </label>
+          <label htmlFor="description">Deadline: </label>
           <input
             type="date"
             id="deadline"
