@@ -9,7 +9,7 @@ Modal.setAppElement("#root");
 
 const DeleteTask = ({taskId, onClose}) => {
   const dispatch = useDispatch();
-  const {tasks,isError,isLoading,isSuccess,message} = useSelector((state) => state.task);
+  const {isError,isLoading,isSuccess,message} = useSelector((state) => state.task);
 
   const handleDelete = async() => {
     await dispatch(deleteTask(taskId));
