@@ -2,6 +2,7 @@ import React from "react";
 import Header from "../components/common/Header.jsx";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import FrontIllustration from '../assets/FrontIllustration.jsx'
 const Home = () => {
   const { user, isLoading, isError, isSuccess, message } = useSelector(
     (state) => state.auth
@@ -10,7 +11,7 @@ const Home = () => {
     <div className="flex flex-col h-screen">
       <Header />
       <div className="flex-1 flex flex-row ">
-        <div className="w-3/6 flex flex-col items-center justify-center px-8">
+        <div className="w-full md:w-3/6 flex flex-col items-center justify-center px-8">
           <h2 className="text-4xl font-bold mb-2 text-center">Welcome to Scrum Flow</h2>
           <h3 className="text-2xl font-bold mb-2 text-olive-green text-center">
             Your Agile Project Companion
@@ -34,7 +35,9 @@ const Home = () => {
             </Link>
           )}
         </div>
-        <div className="w-3/6 bg-olive-green"></div>
+        <div className="w-3/6 hidden justify-center items-center md:flex">
+        <FrontIllustration />
+        </div>
       </div>
     </div>
   );

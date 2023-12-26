@@ -16,7 +16,7 @@ import ScrumMasterDashboard from "./components/ScrumMaster/ScrumMasterDashboard"
 import DevelopmentTeamDashboard from "./components/DevelopmentTeam/DevelopmentTeamDashboard";
 
 // project
-// import ProjectDetail from './components/ProductOwner/ProjectDetail'
+import ProjectDetailDev from './components/DevelopmentTeam/ProjectDetailDev'
 import ProjectDetail from "./components/ScrumMaster/project/ProjectDetail"
 
 const App = () => {
@@ -53,6 +53,7 @@ const App = () => {
             element={user ? (
               <>
                 {user.role === "Scrum Master" && <ProjectDetail  />}
+                {user.role === "Development Team" && <ProjectDetailDev  />}
               </>
             ) : (
               <Navigate to="/dashboard" />

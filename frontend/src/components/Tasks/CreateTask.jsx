@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createTask, reset } from "../../features/Tasks/taskSlice";
-import { updateProject } from "../../features/Projects/projectSlice";
+import { updateProject,getAllProjects } from "../../features/Projects/projectSlice";
 import { toast } from "react-toastify";
 import Select from "react-select";
 import Modal from "react-modal";
@@ -12,11 +12,23 @@ Modal.setAppElement("#root");
 
 const CreateTask = ({ onClose }) => {
   const dispatch = useDispatch();
-  const { isLoading, isError, isSuccess, message } = useSelector(
-    (state) => state.task
-  );
+  const taskState = useSelector((state) => state.task);
+  const projectState = useSelector((state) => state.project);
   const { users } = useSelector((state) => state.users);
-  const { projects,projectDetail } = useSelector((state) => state.project);
+  const {
+    isLoading: isTaskLoading,
+    isError: isTaskError,
+    isSuccess: isTaskSuccess,
+    message: taskMessage
+  } = taskState;
+
+  const {
+    isLoading: isProjectLoading,
+    isError: isProjectError,
+    isSuccess: isProjectSuccess,
+    message: projectMessage,projects,projectDetail
+  } = projectState;
+  
   const project =  projects.find((project) => project._id === projectDetail._id);
   const [taskData, setTaskData] = useState({
     name: "",
@@ -53,34 +65,34 @@ const CreateTask = ({ onClose }) => {
       }));
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
-    const devTeamID = taskData.assignee && taskData.assignee.value
-    dispatch(
-      createTask({
-        ...taskData,
-        assignee: devTeamID,
-      })
-    );
+    const devTeamID = taskData.assignee && taskData.assignee.value;
+    dispatch(createTask({ ...taskData, assignee: devTeamID }));
 
-    if (isError) {
-      toast.error(message);
+    if (isTaskError) {
+      toast.error(taskMessage);
       dispatch(reset());
     }
-    if (isSuccess) {
+    if (isTaskSuccess) {
       onClose();
       toast.success("Task created successfully");
-      const newTaskId = message;
-      const project_id = projectDetail._id
+      const newTaskId = taskMessage;
+      const project_id = projectDetail._id;
       const updatedTasks = [...project.tasks, newTaskId];
       const updatedProject = {
         ...project,
         tasks: updatedTasks,
       };
-      dispatch(updateProject({ projectData:updatedProject, project_id }))
-      dispatch(reset());
+
+      dispatch(updateProject({ projectData: updatedProject, project_id }));
     }
   };
+
+  // useEffect(() => {
+    
+  //   }
+  // }, [isTaskError, isTaskSuccess, taskMessage, dispatch, onClose, project, projectDetail]);
 
   return (
     <Modal
@@ -91,12 +103,12 @@ const CreateTask = ({ onClose }) => {
       onRequestClose={onClose}
       shouldCloseOnOverlayClick={true}
     >
-      <div className="bg-white text-black p-8 mx-12 shadow-md shadow-dark-blue rounded-xl">
+      <div className="bg-white text-black p-8 mx-12 shadow-md shadow-dark-blue rounded-xl px-12">
         <div className="flex justify-end">
           <MdClose size={30} onClick={onClose} />
         </div>
         <h2 className="font-bold text-2xl text-center">Create New Project</h2>
-        {isLoading && <FaSpinner />}
+        {isTaskLoading && <FaSpinner />}
         <form
           onSubmit={handleFormSubmit}
           className="p-8 shadow-lg rounded-md flex flex-col "
@@ -111,7 +123,7 @@ const CreateTask = ({ onClose }) => {
             className="border border-gray rounded-md  py-1 focus:outline-blue"
             required
           />
-          <label htmlFor="description">Start Date: </label>
+          <label htmlFor="description">Deadline: </label>
           <input
             type="date"
             id="deadline"
@@ -129,7 +141,7 @@ const CreateTask = ({ onClose }) => {
               name="description"
               value={taskData.description}
               onChange={handleInputChange}
-              className="border border-gray rounded-md  py-1 focus:outline-blue"
+              className="border border-gray rounded-md  py-1 focus:outline-blue w-72 p-2"
               required
             />
           </label>
@@ -147,9 +159,9 @@ const CreateTask = ({ onClose }) => {
             <button
               type="submit"
               className="p-2 border rounded-md border-olive-green text-olive-green font-bold hover:bg-olive-green hover:text-white"
-              disabled={isLoading}
+              disabled={isTaskLoading}
             >
-              {isLoading ? "Creating..." : "Create Task"}
+              {isTaskLoading ? "Creating..." : "Create Task"}
             </button>
           </div>
         </form>

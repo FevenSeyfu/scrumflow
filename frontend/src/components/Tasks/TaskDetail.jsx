@@ -1,18 +1,20 @@
-import React, { useEffect } from "react";
+import React, {useState} from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getTaskById, reset } from "../../features/Tasks/taskSlice";
 import { MdClose } from "react-icons/md";
 import Modal from "react-modal";
-import { FaSpinner } from "react-icons/fa";
+import { FaSpinner,FaChevronDown } from "react-icons/fa";
+import { toast } from "react-toastify";
+
 Modal.setAppElement("#root");
 
 const TaskDetail = ({ taskId, onClose }) => {
   const dispatch = useDispatch();
+  const [expanded, setExpanded] = useState(false);
   const { tasks, isLoading, isError, isSuccess, message } = useSelector(
     (state) => state.task
   );
   const task = tasks.find((task) => task._id === taskId);
-  const assignee = task.assignee;
+  const assignee =  task.assignee;
   const { _id,username,profileImage} = assignee
   const handleDate = (dateInput) => {
     const months = [
@@ -38,6 +40,20 @@ const TaskDetail = ({ taskId, onClose }) => {
     return `${monthName} ${day}, ${year}`;
   };
 
+  const truncatedDescription = (description) => {
+    const words = description.split(" ");
+    const maxWords = 10;
+
+    if (words.length > maxWords) {
+      return words.slice(0, maxWords).join(" ") + " ...";
+    } else {
+      return description;
+    }
+  };
+
+  const toggleExpansion = () => {
+    setExpanded(!expanded);
+  };
   return (
     <Modal
       isOpen={true}
@@ -52,10 +68,19 @@ const TaskDetail = ({ taskId, onClose }) => {
         {isLoading && <FaSpinner />}
         {isError && toast.error(message)}
         {isSuccess && (
-          <div className="flex flex-row w-auto">
+          <div className="flex flex-col w-auto sm:flex-row">
             <div className="w-full bg-white text-black rounded-md px-4  p-12 ">
               <h3 className="font-bold ">{task.name.toUpperCase()}</h3>
-              <p className="my-2 text-gray">{task.description}</p>
+              <p className="my-2 text-gray"> {" "}
+                {expanded
+                  ? task.description
+                  : truncatedDescription(task.description)}
+                {!expanded && (
+                  <FaChevronDown
+                    onClick={toggleExpansion}
+                    className="cursor-pointer mx-auto text-lg hover:text-olive-green"
+                  />
+                )}</p>
               <p><b>Deadline:</b>{task.deadline && (handleDate(task.deadline))}</p>
             </div>
             <div className="w-full text-white  h-full ">

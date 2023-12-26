@@ -1,17 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllTasks, reset } from "../../features/Tasks/taskSlice";
+import { getAllProjects, reset } from "../../features/Projects/projectSlice";
 import { getAllUsers } from "../../features/users/userSlice";
 import TaskDetail from "./TaskDetail";
 import CreateTask from "./CreateTask";
+import { FaTrash } from "react-icons/fa";
+import DeleteTask from "./DeleteTask";
 
-const TasksList = ({ ProjectTasks }) => {
+const TasksList = ({ ProjectId }) => {
   const dispatch = useDispatch();
-  const [showTaskModal, setShowTaskModal] = useState(false);
-  const [showCreateTaskModal, setShowCreateTaskModal] = useState(false);
-  const [selectedTaskId, setSelectedTaskId] = useState(null);
   const tasks = useSelector((state) => state.task);
   const { users } = useSelector((state) => state.users);
+  const [selectedTaskId, setSelectedTaskId] = useState(null);
+  const [showTaskModal, setShowTaskModal] = useState(false);
+  const [showCreateTaskModal, setShowCreateTaskModal] = useState(false);
+  const [showDeleteTaskModal, setShowDeleteTaskModal] = useState(false);
 
   useEffect(() => {
     dispatch(getAllUsers());
@@ -21,7 +24,7 @@ const TasksList = ({ ProjectTasks }) => {
     return user && user.profileImage;
   };
   useEffect(() => {
-    dispatch(getAllTasks());
+    dispatch(getAllProjects());
     return () => {
       dispatch(reset());
     };
@@ -50,11 +53,22 @@ const TasksList = ({ ProjectTasks }) => {
 
     return `${monthName} ${day}, ${year}`;
   };
+  const isDeadlineNear = (deadline) => {
+    const deadlineDate = new Date(deadline);
+    const currentDate = new Date();
+    const timeDifference = deadlineDate.getTime() - currentDate.getTime();
+    const daysDifference = Math.ceil(timeDifference / (1000 * 3600 * 24));
+
+    return daysDifference <= 3;
+  };
   const columns = {
     "To Do": [],
     "In Progress": [],
     Done: [],
   };
+  const { projects } = useSelector((state) => state.project);
+  const projectDetail = projects.find((project) => project._id === ProjectId);
+  const ProjectTasks = projectDetail.tasks;
   ProjectTasks.forEach((task) => {
     columns[task.status].push(task);
   });
@@ -78,7 +92,7 @@ const TasksList = ({ ProjectTasks }) => {
                 className="border border-olive-green rounded-lg w-full p-2 flex flex-col justify-between items-start"
                 key={task._id}
               >
-                <div className="flex flex-row justify-between">
+                <div className="flex flex-row justify-evenly">
                   <img
                     src={task.assignee && getUser(task.assignee)}
                     alt={`${task.name} image`}
@@ -95,9 +109,21 @@ const TasksList = ({ ProjectTasks }) => {
                       {task.name.toUpperCase()}
                     </h2>
                   </button>
+                  <FaTrash
+                    className="text-red"
+                    onClick={() => {
+                      setSelectedTaskId(task._id);
+                      setShowDeleteTaskModal(true);
+                    }}
+                  />
                 </div>
-                <div className="justify-end">
-                  <p className="text-gray text-right text-sm">
+
+                <div className="flex flex-row justify-end">
+                  <p
+                    className={`text-right text-sm ${
+                      isDeadlineNear(task.deadline) ? "text-red" : "text-gray"
+                    }`}
+                  >
                     {task.deadline && handleDate(task.deadline)}
                   </p>
                 </div>
@@ -106,6 +132,12 @@ const TasksList = ({ ProjectTasks }) => {
                   <TaskDetail
                     taskId={selectedTaskId}
                     onClose={() => setShowTaskModal(false)}
+                  />
+                )}
+                {showDeleteTaskModal && (
+                  <DeleteTask
+                    taskId={selectedTaskId}
+                    onClose={() => setShowDeleteTaskModal(false)}
                   />
                 )}
               </div>
