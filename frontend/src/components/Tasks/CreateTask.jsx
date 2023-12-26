@@ -69,9 +69,7 @@ const CreateTask = ({ onClose }) => {
     e.preventDefault();
     const devTeamID = taskData.assignee && taskData.assignee.value;
     dispatch(createTask({ ...taskData, assignee: devTeamID }));
-  };
 
-  useEffect(() => {
     if (isTaskError) {
       toast.error(taskMessage);
       dispatch(reset());
@@ -89,7 +87,12 @@ const CreateTask = ({ onClose }) => {
 
       dispatch(updateProject({ projectData: updatedProject, project_id }));
     }
-  }, [isTaskError, isTaskSuccess, taskMessage, dispatch, onClose, project, projectDetail]);
+  };
+
+  // useEffect(() => {
+    
+  //   }
+  // }, [isTaskError, isTaskSuccess, taskMessage, dispatch, onClose, project, projectDetail]);
 
   return (
     <Modal

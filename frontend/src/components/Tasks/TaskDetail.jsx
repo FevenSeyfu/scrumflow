@@ -14,7 +14,7 @@ const TaskDetail = ({ taskId, onClose }) => {
     (state) => state.task
   );
   const task = tasks.find((task) => task._id === taskId);
-  const assignee = task.assignee;
+  const assignee =  task.assignee;
   const { _id,username,profileImage} = assignee
   const handleDate = (dateInput) => {
     const months = [
@@ -68,7 +68,7 @@ const TaskDetail = ({ taskId, onClose }) => {
         {isLoading && <FaSpinner />}
         {isError && toast.error(message)}
         {isSuccess && (
-          <div className="flex flex-row w-auto">
+          <div className="flex flex-row w-auto sm:flex-col">
             <div className="w-full bg-white text-black rounded-md px-4  p-12 ">
               <h3 className="font-bold ">{task.name.toUpperCase()}</h3>
               <p className="my-2 text-gray"> {" "}
