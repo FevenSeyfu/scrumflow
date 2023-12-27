@@ -1,6 +1,6 @@
 # Scrum Flow: Agile Project Management 🚀
 
-![Scrum Flow Demo](https://github.com/YourUsername/Scrum-Flow/blob/main/Scrum-Flow-Screenshot.png)
+![Scrum Flow Demo](https://github.com/FevenSeyfu/scrumflow/blob/main/Scrum-Flow-Screenshot.png)
 
 <!-- TABLE OF CONTENTS -->
 
