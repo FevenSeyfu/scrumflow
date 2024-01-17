@@ -1,36 +1,172 @@
-# CodSoft_task2
+# Scrum Flow: Agile Project Management 🚀
 
-CodSoft_task2 is a repository containing second task for CodSoft web developmetn internship which is a full-stack Project Management tool.
+![Scrum Flow Demo](https://github.com/YourUsername/Scrum-Flow/blob/main/Scrum-Flow-Screenshot.png)
 
-## Project Management System
+<!-- TABLE OF CONTENTS -->
 
-The Project Management System helps teams organize and manage their projects. It includes features like task creation, assignment, progress tracking, and collaboration.
+# 📗 Table of Contents
 
-### Technologies Used
-- Frontend: React, Redux
-- Backend: Node.js, Express.js, PostgreSQL
-- Authentication: JSON Web Tokens (JWT)
-- Styling: TailwindCSS
-- ...
+- [📖 About the Project](#about-project)
+  - [🛠 Built With](#built-with)
+    - [Tech Stack](#tech-stack)
+    - [Key Features](#key-features)
+  - [🚀 Live Demo](#live-demo)
+- [💻 Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Setup](#setup)
+  - [Install](#install)
+  - [Usage](#usage)
+  - [Run tests](#run-tests)
+  - [Deployment](#deployment)
+- [👥 Authors](#authors)
+- [🔭 Future Features](#future-features)
+- [🤝 Contributing](#contributing)
+- [⭐️ Show your support](#support)
+- [🙏 Acknowledgements](#acknowledgements)
+- [📝 License](#license)
 
-### Installation
-1. Navigate to the `project-management-system` directory: `cd codsoft_task2/`
-2. Install dependencies: `npm install`
-3. Run the application: `npm start`
+<!-- PROJECT DESCRIPTION -->
+
+## About the Project
+
+**Scrum Flow** is an agile project management tool designed to facilitate Development projects through the SCRUM methodology. It assists teams in managing tasks efficiently with defined roles and tasks for Product owner, Scrum Master and Development Team, promoting iterative development.
+
+### Built With
+
+#### Tech Stack
+
+- [Node.js](https://nodejs.org/)
+- [Express.js](https://expressjs.com/)
+- [MongoDB](https://www.mongodb.com/)
+- [React](https://react.dev/)
+- [Redux](https://redux.js.org/)
+- [TailwindCss](https://tailwindcss.com/)
+
+#### Key Features
+
+- **User Authentication:** Secure access to Scrum Flow using JWT authentication methods.
+- **ROle Based Access:** Separate dashboards to user roles and defined components for each user role , Product owner,scrum Master and Development Team
+- **Task Management:** Create, update, and track tasks and tasks dependencies using SCRUM methodology.
+- **Project Management:** Create, update, and track projects and project tasks.
+
+### Live Demo
+
+- [Live Demo Link](https://scrumflow.netlify.app/)
+
+## Getting Started
+
+To get started with Scrum Flow locally, follow these steps.
+
+### Prerequisites
+
+### Setup
+
+Clone this repository to your desired folder:
+
+```sh
+git clone git@github.com:FevenSeyfu/scrumflow.git
+
+
+### Install
+
+Install this project with:
+
+```sh
+cd scrumflow/backend
+npm install
+
+cd scrumflow/frontend
+npm install
+````
 
 ### Usage
-- Access the deployed application or run it locally.
-- Log in or sign up to create a new account.
-- Manage projects, create tasks, and collaborate with team members.
 
-### Contributing
-To contribute to the Project Management System:
-1. Fork the repository.
-2. Create a new branch: `git checkout -b feature/new-feature`
-3. Make changes and commit: `git commit -m 'Add new feature'`
-4. Push to the branch: `git push origin feature/new-feature`
-5. Open a pull request.
+To run the project, execute the following command:
 
-## License
+```sh
+cd scrumflow/backend
+npm start
 
-This project is licensed under the [MIT License](LICENSE).
+cd scrumflow/frontend
+npm start
+```
+
+### Run tests
+
+To run tests, run the following command:
+
+```sh
+cd scrumflow/backend
+npm test
+```
+
+### Deployment
+
+You can deploy this project using:
+
+<!--
+Example:
+
+```sh
+
+```
+ -->
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- AUTHORS -->
+
+## 👥 Authors <a name="authors"></a>
+
+👤 **Author**
+
+- GitHub: [@FevenSeyfu](https://github.com/FevenSeyfu)
+- Medium: [@fevenseyfu](https://fevenseyfu.medium.com)
+- LinkedIn: [fevenseyfu](https://www.linkedin.com/in/fevenseyfu/)
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- FUTURE FEATURES -->
+
+## 🔭 Future Features <a name="future-features"></a>
+
+
+- [ ] **Notification System:** Integrate Notification system to frontend.
+- [ ] **Project Progress:** Integrate a dashboard to controll project progress .
+- [ ] **Teams Collaberation** Implement collaberation functioality.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- CONTRIBUTING -->
+
+## 🤝 Contributing <a name="contributing"></a>
+
+Contributions, issues, and feature requests are welcome!
+
+Feel free to check the [issues page](../../issues/).
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- SUPPORT -->
+
+## ⭐️ Show your support <a name="support"></a>
+
+If you like this project you can give it a star and any feedback is apprectiated.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- ACKNOWLEDGEMENTS -->
+
+## 🙏 Acknowledgments <a name="acknowledgements"></a>
+
+I would like to thank for those who have tested and gave me feedback
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- LICENSE -->
+
+## 📝 License <a name="license"></a>
+
+This project is [MIT](./LICENSE) licensed.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
